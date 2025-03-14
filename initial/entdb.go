@@ -10,7 +10,7 @@ import (
 )
 
 func InitEntdb(workDir string, logger *zap.Logger) *ent.Client {
-	entClient, err := ent.Open(dialect.SQLite, fmt.Sprintf("file:%s/sifu-box.db?cache=shared&_fk=1", workDir))
+	entClient, err := ent.Open(dialect.SQLite, fmt.Sprintf("file:%s/sifu-tool.db?cache=shared&_fk=1", workDir))
 	if err != nil {
 		logger.Error(fmt.Sprintf("连接Ent数据库失败: [%s]", err.Error()))
 		panic(err)
