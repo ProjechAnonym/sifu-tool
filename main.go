@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
-	"sifu-tool/ddns"
+    "sifu-tool/ddns"
 	"sifu-tool/ent"
 	"sifu-tool/initial"
 	"sifu-tool/middleware"
@@ -58,7 +58,7 @@ func main()  {
 	api := server.Group("/api")
 	route.SettingLogin(api, setting.User, webLogger)
 	route.SettingDDNS(api, setting.User.Secret, webLogger)
-	a,_ := ddns.IPfromInterface("Tailscale",`^fe.*$`, webLogger)
+	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
 	if setting.Server.Tls != nil {
 		server.RunTLS(fmt.Sprintf(":%d", setting.Server.Tls.Port), setting.Server.Tls.Cert, setting.Server.Tls.Key)
