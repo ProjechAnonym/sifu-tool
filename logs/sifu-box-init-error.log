@@ -1,0 +1,9 @@
+2025-03-13T14:19:40.809+0800	FATAL	sifu-cert/main.go:36	读取配置文件失败: Unsupported Config Type ""
+2025-03-14T11:32:22.440+0800	FATAL	sifu-cert/main.go:44	解析配置文件失败: 2 error(s) decoding:
+
+* 'DDNS.V4API' expected type 'string', got unconvertible type '[]interface {}', value: '[https://api.ipify.org?format=json]'
+* 'DDNS.V6API' expected type 'string', got unconvertible type '[]interface {}', value: '[https://api6.ipify.org?format=json]'
+2025-03-14T11:36:01.185+0800	FATAL	sifu-cert/main.go:42	解析配置文件失败: 2 error(s) decoding:
+
+* 'DDNS.V4API' expected type 'string', got unconvertible type '[]interface {}', value: '[https://api.ipify.org?format=json]'
+* 'DDNS.V6API' expected type 'string', got unconvertible type '[]interface {}', value: '[https://api6.ipify.org?format=json]'

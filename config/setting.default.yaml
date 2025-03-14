@@ -1,0 +1,20 @@
+User:
+  username: admin
+  password: admin
+  email: admin@admin.com
+  secret: sifulin
+server:
+  # tls:
+  #   key: /etc/letsencrypt/live/www.example.com/privkey.pem
+  #   cert: /etc/letsencrypt/live/www.example.com/fullchain.pem
+  #   port: 8443
+  enterance: /
+ddns:
+  v4api:
+    - https://myip.ipip.net
+    # - https://api.ipify.org?format=json
+  v6api:
+    # - https://api6.ipify.org?format=json
+    - https://6.ipw.cn
+  cloudflare:
+    zoneAPI: https://api.cloudflare.com/client/v4/zones
