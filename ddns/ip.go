@@ -1,17 +1,20 @@
 package ddns
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"net"
 	"net/http"
 	"regexp"
 	"sifu-tool/models"
+	"strings"
 
+	"github.com/go-cmd/cmd"
 	"go.uber.org/zap"
 )
 
-func IPfromAPI(api string, client *http.Client, logger *zap.Logger) (string, error) {
+func IPfromAPI(api, reStr string, client *http.Client, logger *zap.Logger) (string, error) {
 	req, err := http.NewRequest("GET", api, nil)
 	if err != nil {
 		logger.Error(fmt.Sprintf("创建请求失败: [%s]", err.Error()))
@@ -28,14 +31,9 @@ func IPfromAPI(api string, client *http.Client, logger *zap.Logger) (string, err
 		logger.Error(fmt.Sprintf("读取响应失败: [%s]", err.Error()))
 		return "", err
 	}
-	
-	rev4 := regexp.MustCompile(models.Rev4)
-	rev6 := regexp.MustCompile(models.Rev6)
-	if ip := rev4.FindString(string(content)); ip != "" {
-		return fmt.Sprintf("v4:[%s]",ip), nil
-	}
-	if ip := rev6.FindString(string(content)); ip != "" {
-		return fmt.Sprintf("v6:[%s]",ip), nil
+	re := regexp.MustCompile(reStr)
+	if ip := re.FindString(string(content)); ip != "" {
+		return ip, nil
 	}
 	return "", fmt.Errorf("未查找到IP字段")
 }
@@ -63,6 +61,30 @@ func IPfromInterface(interfaceName, reStr string, logger *zap.Logger) (string, e
 			return "", fmt.Errorf(`解析网卡"%s"地址"%s"失败`, targetInterface.Name, addr.String())
 		}
 		return address.String(), nil
+	}
+	return "", fmt.Errorf("未查找到IP字段")
+}
+
+func IPfromScript(script string, logger *zap.Logger) (string, error) {
+	cmd := cmd.NewCmd("sh", "-c", script)
+	status := <- cmd.Start()
+	// 执行命令
+	if status.Error != nil {
+		logger.Error(fmt.Sprintf("执行脚本失败: [%s]", status.Error.Error()))
+		return "", status.Error
+	}
+	if len(status.Stderr) != 0 {
+		logger.Error(fmt.Sprintf("执行脚本失败: [%s]", strings.Join(status.Stderr, "")))
+		return "", errors.New(strings.Join(status.Stderr, ""))
+	}
+	
+	rev4 := regexp.MustCompile(models.Rev4)
+	rev6 := regexp.MustCompile(models.Rev6)
+	if ip := rev4.FindString(strings.Join(status.Stdout, "")); ip != "" {
+		return ip, nil
+	}
+	if ip := rev6.FindString(strings.Join(status.Stdout, "")); ip != "" {
+		return ip, nil
 	}
 	return "", fmt.Errorf("未查找到IP字段")
 }

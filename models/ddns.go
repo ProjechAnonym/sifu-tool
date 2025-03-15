@@ -7,4 +7,5 @@ type DDNS struct {
 }
 type Cloudflare struct {
 	ZoneAPI string `yaml:"zoneAPI"`
+	RecordAPI string `yaml:"recordAPI"`
 }

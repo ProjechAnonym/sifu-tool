@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
-    "sifu-tool/ddns"
+	"sifu-tool/ddns"
 	"sifu-tool/ent"
 	"sifu-tool/initial"
 	"sifu-tool/middleware"
@@ -60,6 +61,8 @@ func main()  {
 	route.SettingDDNS(api, setting.User.Secret, webLogger)
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
+	client := http.DefaultClient
+	ddns.SetCFRecord(setting.DDNS.Cloudflare.ZoneAPI, "", "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", client, webLogger)
 	if setting.Server.Tls != nil {
 		server.RunTLS(fmt.Sprintf(":%d", setting.Server.Tls.Port), setting.Server.Tls.Cert, setting.Server.Tls.Key)
 	}
