@@ -160,8 +160,8 @@ func (dc *DDNSCreate) SetNillableV6interface(s *string) *DDNSCreate {
 }
 
 // SetDomains sets the "domains" field.
-func (dc *DDNSCreate) SetDomains(s []string) *DDNSCreate {
-	dc.mutation.SetDomains(s)
+func (dc *DDNSCreate) SetDomains(m map[string]string) *DDNSCreate {
+	dc.mutation.SetDomains(m)
 	return dc
 }
 

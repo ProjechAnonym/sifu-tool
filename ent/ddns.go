@@ -38,7 +38,7 @@ type DDNS struct {
 	// V6interface holds the value of the "v6interface" field.
 	V6interface string `json:"v6interface,omitempty"`
 	// Domains holds the value of the "domains" field.
-	Domains []string `json:"domains,omitempty"`
+	Domains map[string]string `json:"domains,omitempty"`
 	// Config holds the value of the "config" field.
 	Config map[string]string `json:"config,omitempty"`
 	// Result holds the value of the "result" field.

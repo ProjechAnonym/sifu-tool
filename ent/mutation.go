@@ -372,8 +372,7 @@ type DDNSMutation struct {
 	v4interface   *string
 	v6script      *string
 	v6interface   *string
-	domains       *[]string
-	appenddomains []string
+	domains       *map[string]string
 	_config       *map[string]string
 	result        *map[string]string
 	status        *map[string]int
@@ -1015,13 +1014,12 @@ func (m *DDNSMutation) ResetV6interface() {
 }
 
 // SetDomains sets the "domains" field.
-func (m *DDNSMutation) SetDomains(s []string) {
-	m.domains = &s
-	m.appenddomains = nil
+func (m *DDNSMutation) SetDomains(value map[string]string) {
+	m.domains = &value
 }
 
 // Domains returns the value of the "domains" field in the mutation.
-func (m *DDNSMutation) Domains() (r []string, exists bool) {
+func (m *DDNSMutation) Domains() (r map[string]string, exists bool) {
 	v := m.domains
 	if v == nil {
 		return
@@ -1032,7 +1030,7 @@ func (m *DDNSMutation) Domains() (r []string, exists bool) {
 // OldDomains returns the old "domains" field's value of the DDNS entity.
 // If the DDNS object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DDNSMutation) OldDomains(ctx context.Context) (v []string, err error) {
+func (m *DDNSMutation) OldDomains(ctx context.Context) (v map[string]string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDomains is only allowed on UpdateOne operations")
 	}
@@ -1046,23 +1044,9 @@ func (m *DDNSMutation) OldDomains(ctx context.Context) (v []string, err error) {
 	return oldValue.Domains, nil
 }
 
-// AppendDomains adds s to the "domains" field.
-func (m *DDNSMutation) AppendDomains(s []string) {
-	m.appenddomains = append(m.appenddomains, s...)
-}
-
-// AppendedDomains returns the list of values that were appended to the "domains" field in this mutation.
-func (m *DDNSMutation) AppendedDomains() ([]string, bool) {
-	if len(m.appenddomains) == 0 {
-		return nil, false
-	}
-	return m.appenddomains, true
-}
-
 // ResetDomains resets all changes to the "domains" field.
 func (m *DDNSMutation) ResetDomains() {
 	m.domains = nil
-	m.appenddomains = nil
 }
 
 // SetConfig sets the "config" field.
@@ -1472,7 +1456,7 @@ func (m *DDNSMutation) SetField(name string, value ent.Value) error {
 		m.SetV6interface(v)
 		return nil
 	case ddns.FieldDomains:
-		v, ok := value.([]string)
+		v, ok := value.(map[string]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

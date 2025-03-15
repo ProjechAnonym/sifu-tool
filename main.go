@@ -53,6 +53,7 @@ func main()  {
 		entClient.Close()	
 		buntClient.Close()
 	}()
+	domais := []models.Domain{models.Domain{Domain: "*.lzhlovelcl.top", Type: "A", Value: "1.1.1.1"}}
 	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
 	server.Use(middleware.Logger(webLogger), middleware.Recovery(true, webLogger), cors.New(middleware.Cors(*domains)))
@@ -62,7 +63,7 @@ func main()  {
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
 	client := http.DefaultClient
-	ddns.SetCFRecord(setting.DDNS.Cloudflare.ZoneAPI, "", "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", client, webLogger)
+	ddns.SetCFRecord(setting.DDNS.Cloudflare.ZoneAPI, setting.DDNS.Cloudflare.RecordAPI, "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", "1.1.1.1","::1",domais, client, webLogger)
 	if setting.Server.Tls != nil {
 		server.RunTLS(fmt.Sprintf(":%d", setting.Server.Tls.Port), setting.Server.Tls.Cert, setting.Server.Tls.Key)
 	}

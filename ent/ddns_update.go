@@ -11,7 +11,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 )
 
@@ -243,14 +242,8 @@ func (du *DDNSUpdate) ClearV6interface() *DDNSUpdate {
 }
 
 // SetDomains sets the "domains" field.
-func (du *DDNSUpdate) SetDomains(s []string) *DDNSUpdate {
-	du.mutation.SetDomains(s)
-	return du
-}
-
-// AppendDomains appends s to the "domains" field.
-func (du *DDNSUpdate) AppendDomains(s []string) *DDNSUpdate {
-	du.mutation.AppendDomains(s)
+func (du *DDNSUpdate) SetDomains(m map[string]string) *DDNSUpdate {
+	du.mutation.SetDomains(m)
 	return du
 }
 
@@ -447,11 +440,6 @@ func (du *DDNSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := du.mutation.Domains(); ok {
 		_spec.SetField(ddns.FieldDomains, field.TypeJSON, value)
-	}
-	if value, ok := du.mutation.AppendedDomains(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, ddns.FieldDomains, value)
-		})
 	}
 	if value, ok := du.mutation.Config(); ok {
 		_spec.SetField(ddns.FieldConfig, field.TypeJSON, value)
@@ -706,14 +694,8 @@ func (duo *DDNSUpdateOne) ClearV6interface() *DDNSUpdateOne {
 }
 
 // SetDomains sets the "domains" field.
-func (duo *DDNSUpdateOne) SetDomains(s []string) *DDNSUpdateOne {
-	duo.mutation.SetDomains(s)
-	return duo
-}
-
-// AppendDomains appends s to the "domains" field.
-func (duo *DDNSUpdateOne) AppendDomains(s []string) *DDNSUpdateOne {
-	duo.mutation.AppendDomains(s)
+func (duo *DDNSUpdateOne) SetDomains(m map[string]string) *DDNSUpdateOne {
+	duo.mutation.SetDomains(m)
 	return duo
 }
 
@@ -940,11 +922,6 @@ func (duo *DDNSUpdateOne) sqlSave(ctx context.Context) (_node *DDNS, err error) 
 	}
 	if value, ok := duo.mutation.Domains(); ok {
 		_spec.SetField(ddns.FieldDomains, field.TypeJSON, value)
-	}
-	if value, ok := duo.mutation.AppendedDomains(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, ddns.FieldDomains, value)
-		})
 	}
 	if value, ok := duo.mutation.Config(); ok {
 		_spec.SetField(ddns.FieldConfig, field.TypeJSON, value)
