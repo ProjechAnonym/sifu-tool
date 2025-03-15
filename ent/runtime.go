@@ -66,8 +66,4 @@ func init() {
 	ddnsDescV6interface := ddnsFields[9].Descriptor()
 	// ddns.V6interfaceValidator is a validator for the "v6interface" field. It is called by the builders before save.
 	ddns.V6interfaceValidator = ddnsDescV6interface.Validators[0].(func(string) error)
-	// ddnsDescResult is the schema descriptor for result field.
-	ddnsDescResult := ddnsFields[12].Descriptor()
-	// ddns.ResultValidator is a validator for the "result" field. It is called by the builders before save.
-	ddns.ResultValidator = ddnsDescResult.Validators[0].(func(string) error)
 }

@@ -18,4 +18,4 @@ ddns:
     - https://6.ipw.cn
   cloudflare:
     zoneAPI: https://api.cloudflare.com/client/v4/zones
-    recordAPI: "https://api.cloudflare.com/client/v4/zones/%s/dns_records?type=A"
+    recordAPI: "https://api.cloudflare.com/client/v4/zones/%s/dns_records"

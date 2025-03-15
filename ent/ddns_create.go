@@ -172,22 +172,14 @@ func (dc *DDNSCreate) SetConfig(m map[string]string) *DDNSCreate {
 }
 
 // SetResult sets the "result" field.
-func (dc *DDNSCreate) SetResult(s string) *DDNSCreate {
-	dc.mutation.SetResult(s)
-	return dc
-}
-
-// SetNillableResult sets the "result" field if the given value is not nil.
-func (dc *DDNSCreate) SetNillableResult(s *string) *DDNSCreate {
-	if s != nil {
-		dc.SetResult(*s)
-	}
+func (dc *DDNSCreate) SetResult(m map[string]string) *DDNSCreate {
+	dc.mutation.SetResult(m)
 	return dc
 }
 
 // SetStatus sets the "status" field.
-func (dc *DDNSCreate) SetStatus(b bool) *DDNSCreate {
-	dc.mutation.SetStatus(b)
+func (dc *DDNSCreate) SetStatus(m map[string]int) *DDNSCreate {
+	dc.mutation.SetStatus(m)
 	return dc
 }
 
@@ -277,11 +269,6 @@ func (dc *DDNSCreate) check() error {
 	if _, ok := dc.mutation.Config(); !ok {
 		return &ValidationError{Name: "config", err: errors.New(`ent: missing required field "DDNS.config"`)}
 	}
-	if v, ok := dc.mutation.Result(); ok {
-		if err := ddns.ResultValidator(v); err != nil {
-			return &ValidationError{Name: "result", err: fmt.Errorf(`ent: validator failed for field "DDNS.result": %w`, err)}
-		}
-	}
 	if _, ok := dc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "DDNS.status"`)}
 	}
@@ -360,11 +347,11 @@ func (dc *DDNSCreate) createSpec() (*DDNS, *sqlgraph.CreateSpec) {
 		_node.Config = value
 	}
 	if value, ok := dc.mutation.Result(); ok {
-		_spec.SetField(ddns.FieldResult, field.TypeString, value)
+		_spec.SetField(ddns.FieldResult, field.TypeJSON, value)
 		_node.Result = value
 	}
 	if value, ok := dc.mutation.Status(); ok {
-		_spec.SetField(ddns.FieldStatus, field.TypeBool, value)
+		_spec.SetField(ddns.FieldStatus, field.TypeJSON, value)
 		_node.Status = value
 	}
 	if value, ok := dc.mutation.Webhook(); ok {

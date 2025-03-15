@@ -261,16 +261,8 @@ func (du *DDNSUpdate) SetConfig(m map[string]string) *DDNSUpdate {
 }
 
 // SetResult sets the "result" field.
-func (du *DDNSUpdate) SetResult(s string) *DDNSUpdate {
-	du.mutation.SetResult(s)
-	return du
-}
-
-// SetNillableResult sets the "result" field if the given value is not nil.
-func (du *DDNSUpdate) SetNillableResult(s *string) *DDNSUpdate {
-	if s != nil {
-		du.SetResult(*s)
-	}
+func (du *DDNSUpdate) SetResult(m map[string]string) *DDNSUpdate {
+	du.mutation.SetResult(m)
 	return du
 }
 
@@ -281,16 +273,8 @@ func (du *DDNSUpdate) ClearResult() *DDNSUpdate {
 }
 
 // SetStatus sets the "status" field.
-func (du *DDNSUpdate) SetStatus(b bool) *DDNSUpdate {
-	du.mutation.SetStatus(b)
-	return du
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (du *DDNSUpdate) SetNillableStatus(b *bool) *DDNSUpdate {
-	if b != nil {
-		du.SetStatus(*b)
-	}
+func (du *DDNSUpdate) SetStatus(m map[string]int) *DDNSUpdate {
+	du.mutation.SetStatus(m)
 	return du
 }
 
@@ -378,11 +362,6 @@ func (du *DDNSUpdate) check() error {
 	if v, ok := du.mutation.V6interface(); ok {
 		if err := ddns.V6interfaceValidator(v); err != nil {
 			return &ValidationError{Name: "v6interface", err: fmt.Errorf(`ent: validator failed for field "DDNS.v6interface": %w`, err)}
-		}
-	}
-	if v, ok := du.mutation.Result(); ok {
-		if err := ddns.ResultValidator(v); err != nil {
-			return &ValidationError{Name: "result", err: fmt.Errorf(`ent: validator failed for field "DDNS.result": %w`, err)}
 		}
 	}
 	return nil
@@ -478,13 +457,13 @@ func (du *DDNSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(ddns.FieldConfig, field.TypeJSON, value)
 	}
 	if value, ok := du.mutation.Result(); ok {
-		_spec.SetField(ddns.FieldResult, field.TypeString, value)
+		_spec.SetField(ddns.FieldResult, field.TypeJSON, value)
 	}
 	if du.mutation.ResultCleared() {
-		_spec.ClearField(ddns.FieldResult, field.TypeString)
+		_spec.ClearField(ddns.FieldResult, field.TypeJSON)
 	}
 	if value, ok := du.mutation.Status(); ok {
-		_spec.SetField(ddns.FieldStatus, field.TypeBool, value)
+		_spec.SetField(ddns.FieldStatus, field.TypeJSON, value)
 	}
 	if value, ok := du.mutation.Webhook(); ok {
 		_spec.SetField(ddns.FieldWebhook, field.TypeJSON, value)
@@ -745,16 +724,8 @@ func (duo *DDNSUpdateOne) SetConfig(m map[string]string) *DDNSUpdateOne {
 }
 
 // SetResult sets the "result" field.
-func (duo *DDNSUpdateOne) SetResult(s string) *DDNSUpdateOne {
-	duo.mutation.SetResult(s)
-	return duo
-}
-
-// SetNillableResult sets the "result" field if the given value is not nil.
-func (duo *DDNSUpdateOne) SetNillableResult(s *string) *DDNSUpdateOne {
-	if s != nil {
-		duo.SetResult(*s)
-	}
+func (duo *DDNSUpdateOne) SetResult(m map[string]string) *DDNSUpdateOne {
+	duo.mutation.SetResult(m)
 	return duo
 }
 
@@ -765,16 +736,8 @@ func (duo *DDNSUpdateOne) ClearResult() *DDNSUpdateOne {
 }
 
 // SetStatus sets the "status" field.
-func (duo *DDNSUpdateOne) SetStatus(b bool) *DDNSUpdateOne {
-	duo.mutation.SetStatus(b)
-	return duo
-}
-
-// SetNillableStatus sets the "status" field if the given value is not nil.
-func (duo *DDNSUpdateOne) SetNillableStatus(b *bool) *DDNSUpdateOne {
-	if b != nil {
-		duo.SetStatus(*b)
-	}
+func (duo *DDNSUpdateOne) SetStatus(m map[string]int) *DDNSUpdateOne {
+	duo.mutation.SetStatus(m)
 	return duo
 }
 
@@ -875,11 +838,6 @@ func (duo *DDNSUpdateOne) check() error {
 	if v, ok := duo.mutation.V6interface(); ok {
 		if err := ddns.V6interfaceValidator(v); err != nil {
 			return &ValidationError{Name: "v6interface", err: fmt.Errorf(`ent: validator failed for field "DDNS.v6interface": %w`, err)}
-		}
-	}
-	if v, ok := duo.mutation.Result(); ok {
-		if err := ddns.ResultValidator(v); err != nil {
-			return &ValidationError{Name: "result", err: fmt.Errorf(`ent: validator failed for field "DDNS.result": %w`, err)}
 		}
 	}
 	return nil
@@ -992,13 +950,13 @@ func (duo *DDNSUpdateOne) sqlSave(ctx context.Context) (_node *DDNS, err error) 
 		_spec.SetField(ddns.FieldConfig, field.TypeJSON, value)
 	}
 	if value, ok := duo.mutation.Result(); ok {
-		_spec.SetField(ddns.FieldResult, field.TypeString, value)
+		_spec.SetField(ddns.FieldResult, field.TypeJSON, value)
 	}
 	if duo.mutation.ResultCleared() {
-		_spec.ClearField(ddns.FieldResult, field.TypeString)
+		_spec.ClearField(ddns.FieldResult, field.TypeJSON)
 	}
 	if value, ok := duo.mutation.Status(); ok {
-		_spec.SetField(ddns.FieldStatus, field.TypeBool, value)
+		_spec.SetField(ddns.FieldStatus, field.TypeJSON, value)
 	}
 	if value, ok := duo.mutation.Webhook(); ok {
 		_spec.SetField(ddns.FieldWebhook, field.TypeJSON, value)

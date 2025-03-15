@@ -103,16 +103,6 @@ func V6interface(v string) predicate.DDNS {
 	return predicate.DDNS(sql.FieldEQ(FieldV6interface, v))
 }
 
-// Result applies equality check predicate on the "result" field. It's identical to ResultEQ.
-func Result(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldEQ(FieldResult, v))
-}
-
-// Status applies equality check predicate on the "status" field. It's identical to StatusEQ.
-func Status(v bool) predicate.DDNS {
-	return predicate.DDNS(sql.FieldEQ(FieldStatus, v))
-}
-
 // V4methodEQ applies the EQ predicate on the "v4method" field.
 func V4methodEQ(v int) predicate.DDNS {
 	return predicate.DDNS(sql.FieldEQ(FieldV4method, v))
@@ -813,61 +803,6 @@ func V6interfaceContainsFold(v string) predicate.DDNS {
 	return predicate.DDNS(sql.FieldContainsFold(FieldV6interface, v))
 }
 
-// ResultEQ applies the EQ predicate on the "result" field.
-func ResultEQ(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldEQ(FieldResult, v))
-}
-
-// ResultNEQ applies the NEQ predicate on the "result" field.
-func ResultNEQ(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldNEQ(FieldResult, v))
-}
-
-// ResultIn applies the In predicate on the "result" field.
-func ResultIn(vs ...string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldIn(FieldResult, vs...))
-}
-
-// ResultNotIn applies the NotIn predicate on the "result" field.
-func ResultNotIn(vs ...string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldNotIn(FieldResult, vs...))
-}
-
-// ResultGT applies the GT predicate on the "result" field.
-func ResultGT(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldGT(FieldResult, v))
-}
-
-// ResultGTE applies the GTE predicate on the "result" field.
-func ResultGTE(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldGTE(FieldResult, v))
-}
-
-// ResultLT applies the LT predicate on the "result" field.
-func ResultLT(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldLT(FieldResult, v))
-}
-
-// ResultLTE applies the LTE predicate on the "result" field.
-func ResultLTE(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldLTE(FieldResult, v))
-}
-
-// ResultContains applies the Contains predicate on the "result" field.
-func ResultContains(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldContains(FieldResult, v))
-}
-
-// ResultHasPrefix applies the HasPrefix predicate on the "result" field.
-func ResultHasPrefix(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldHasPrefix(FieldResult, v))
-}
-
-// ResultHasSuffix applies the HasSuffix predicate on the "result" field.
-func ResultHasSuffix(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldHasSuffix(FieldResult, v))
-}
-
 // ResultIsNil applies the IsNil predicate on the "result" field.
 func ResultIsNil() predicate.DDNS {
 	return predicate.DDNS(sql.FieldIsNull(FieldResult))
@@ -876,26 +811,6 @@ func ResultIsNil() predicate.DDNS {
 // ResultNotNil applies the NotNil predicate on the "result" field.
 func ResultNotNil() predicate.DDNS {
 	return predicate.DDNS(sql.FieldNotNull(FieldResult))
-}
-
-// ResultEqualFold applies the EqualFold predicate on the "result" field.
-func ResultEqualFold(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldEqualFold(FieldResult, v))
-}
-
-// ResultContainsFold applies the ContainsFold predicate on the "result" field.
-func ResultContainsFold(v string) predicate.DDNS {
-	return predicate.DDNS(sql.FieldContainsFold(FieldResult, v))
-}
-
-// StatusEQ applies the EQ predicate on the "status" field.
-func StatusEQ(v bool) predicate.DDNS {
-	return predicate.DDNS(sql.FieldEQ(FieldStatus, v))
-}
-
-// StatusNEQ applies the NEQ predicate on the "status" field.
-func StatusNEQ(v bool) predicate.DDNS {
-	return predicate.DDNS(sql.FieldNEQ(FieldStatus, v))
 }
 
 // WebhookIsNil applies the IsNil predicate on the "webhook" field.

@@ -375,8 +375,8 @@ type DDNSMutation struct {
 	domains       *[]string
 	appenddomains []string
 	_config       *map[string]string
-	result        *string
-	status        *bool
+	result        *map[string]string
+	status        *map[string]int
 	webhook       *map[string]string
 	clearedFields map[string]struct{}
 	done          bool
@@ -1102,12 +1102,12 @@ func (m *DDNSMutation) ResetConfig() {
 }
 
 // SetResult sets the "result" field.
-func (m *DDNSMutation) SetResult(s string) {
-	m.result = &s
+func (m *DDNSMutation) SetResult(value map[string]string) {
+	m.result = &value
 }
 
 // Result returns the value of the "result" field in the mutation.
-func (m *DDNSMutation) Result() (r string, exists bool) {
+func (m *DDNSMutation) Result() (r map[string]string, exists bool) {
 	v := m.result
 	if v == nil {
 		return
@@ -1118,7 +1118,7 @@ func (m *DDNSMutation) Result() (r string, exists bool) {
 // OldResult returns the old "result" field's value of the DDNS entity.
 // If the DDNS object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DDNSMutation) OldResult(ctx context.Context) (v string, err error) {
+func (m *DDNSMutation) OldResult(ctx context.Context) (v map[string]string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldResult is only allowed on UpdateOne operations")
 	}
@@ -1151,12 +1151,12 @@ func (m *DDNSMutation) ResetResult() {
 }
 
 // SetStatus sets the "status" field.
-func (m *DDNSMutation) SetStatus(b bool) {
-	m.status = &b
+func (m *DDNSMutation) SetStatus(value map[string]int) {
+	m.status = &value
 }
 
 // Status returns the value of the "status" field in the mutation.
-func (m *DDNSMutation) Status() (r bool, exists bool) {
+func (m *DDNSMutation) Status() (r map[string]int, exists bool) {
 	v := m.status
 	if v == nil {
 		return
@@ -1167,7 +1167,7 @@ func (m *DDNSMutation) Status() (r bool, exists bool) {
 // OldStatus returns the old "status" field's value of the DDNS entity.
 // If the DDNS object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DDNSMutation) OldStatus(ctx context.Context) (v bool, err error) {
+func (m *DDNSMutation) OldStatus(ctx context.Context) (v map[string]int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
 	}
@@ -1486,14 +1486,14 @@ func (m *DDNSMutation) SetField(name string, value ent.Value) error {
 		m.SetConfig(v)
 		return nil
 	case ddns.FieldResult:
-		v, ok := value.(string)
+		v, ok := value.(map[string]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetResult(v)
 		return nil
 	case ddns.FieldStatus:
-		v, ok := value.(bool)
+		v, ok := value.(map[string]int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

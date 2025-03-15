@@ -92,8 +92,6 @@ var (
 	V6scriptValidator func(string) error
 	// V6interfaceValidator is a validator for the "v6interface" field. It is called by the builders before save.
 	V6interfaceValidator func(string) error
-	// ResultValidator is a validator for the "result" field. It is called by the builders before save.
-	ResultValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the DDNS queries.
@@ -152,14 +150,4 @@ func ByV6script(opts ...sql.OrderTermOption) OrderOption {
 // ByV6interface orders the results by the v6interface field.
 func ByV6interface(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldV6interface, opts...).ToFunc()
-}
-
-// ByResult orders the results by the result field.
-func ByResult(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldResult, opts...).ToFunc()
-}
-
-// ByStatus orders the results by the status field.
-func ByStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldStatus, opts...).ToFunc()
 }

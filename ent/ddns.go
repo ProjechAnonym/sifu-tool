@@ -42,9 +42,9 @@ type DDNS struct {
 	// Config holds the value of the "config" field.
 	Config map[string]string `json:"config,omitempty"`
 	// Result holds the value of the "result" field.
-	Result string `json:"result,omitempty"`
+	Result map[string]string `json:"result,omitempty"`
 	// Status holds the value of the "status" field.
-	Status bool `json:"status,omitempty"`
+	Status map[string]int `json:"status,omitempty"`
 	// Webhook holds the value of the "webhook" field.
 	Webhook      map[string]string `json:"webhook,omitempty"`
 	selectValues sql.SelectValues
@@ -55,13 +55,11 @@ func (*DDNS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case ddns.FieldDomains, ddns.FieldConfig, ddns.FieldWebhook:
+		case ddns.FieldDomains, ddns.FieldConfig, ddns.FieldResult, ddns.FieldStatus, ddns.FieldWebhook:
 			values[i] = new([]byte)
-		case ddns.FieldStatus:
-			values[i] = new(sql.NullBool)
 		case ddns.FieldID, ddns.FieldV4method, ddns.FieldV6method:
 			values[i] = new(sql.NullInt64)
-		case ddns.FieldIpv6, ddns.FieldRev6, ddns.FieldIpv4, ddns.FieldRev4, ddns.FieldV4script, ddns.FieldV4interface, ddns.FieldV6script, ddns.FieldV6interface, ddns.FieldResult:
+		case ddns.FieldIpv6, ddns.FieldRev6, ddns.FieldIpv4, ddns.FieldRev4, ddns.FieldV4script, ddns.FieldV4interface, ddns.FieldV6script, ddns.FieldV6interface:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -161,16 +159,20 @@ func (d *DDNS) assignValues(columns []string, values []any) error {
 				}
 			}
 		case ddns.FieldResult:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field result", values[i])
-			} else if value.Valid {
-				d.Result = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &d.Result); err != nil {
+					return fmt.Errorf("unmarshal field result: %w", err)
+				}
 			}
 		case ddns.FieldStatus:
-			if value, ok := values[i].(*sql.NullBool); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field status", values[i])
-			} else if value.Valid {
-				d.Status = value.Bool
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &d.Status); err != nil {
+					return fmt.Errorf("unmarshal field status: %w", err)
+				}
 			}
 		case ddns.FieldWebhook:
 			if value, ok := values[i].(*[]byte); !ok {
@@ -253,7 +255,7 @@ func (d *DDNS) String() string {
 	builder.WriteString(fmt.Sprintf("%v", d.Config))
 	builder.WriteString(", ")
 	builder.WriteString("result=")
-	builder.WriteString(d.Result)
+	builder.WriteString(fmt.Sprintf("%v", d.Result))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", d.Status))
