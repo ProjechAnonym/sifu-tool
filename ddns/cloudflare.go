@@ -121,7 +121,7 @@ func getRecordID(zoneID, api, token string, client *http.Client, logger *zap.Log
 		}
 		return records, domains, nil
 	}
-	return nil, nil, fmt.Errorf("获取recordID失败")
+	return nil, nil, nil
 }
 func SetCFRecord(zoneAPI, recordAPI, token, ipv4, ipv6 string, domains []models.Domain, client *http.Client, logger *zap.Logger) error {
 	zoneID, err := getZoneID(zoneAPI, token, client, logger)
@@ -138,12 +138,15 @@ func SetCFRecord(zoneAPI, recordAPI, token, ipv4, ipv6 string, domains []models.
 		if recordsMap[domain.Domain] == nil {
 			continue
 		}
+		edit := false
 		for _, recordID := range recordsMap[domain.Domain] {
 			if records[recordID]["type"] == domain.Type {
-				
+				edit = true
 			}
 		}
-
+		if edit {
+			
+		}
 	}
 
 	return nil
