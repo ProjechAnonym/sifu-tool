@@ -53,7 +53,7 @@ func main()  {
 		entClient.Close()	
 		buntClient.Close()
 	}()
-	domais := []models.Domain{models.Domain{Domain: "*.lzhlovelcl.top", Type: "A", Value: "1.1.1.1"}}
+	domais := []models.Domain{models.Domain{Domain: "*.lzhlovelcl.top", Type: "A", Value: "1.1.1.1"},models.Domain{Domain: "2.lzhlovelcl.top", Type: "A", Value: "1.1.1.1"}}
 	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
 	server.Use(middleware.Logger(webLogger), middleware.Recovery(true, webLogger), cors.New(middleware.Cors(*domains)))

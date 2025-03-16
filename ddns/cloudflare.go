@@ -134,20 +134,41 @@ func SetCFRecord(zoneAPI, recordAPI, token, ipv4, ipv6 string, domains []models.
 		logger.Error(fmt.Sprintf("获取recordID失败: [%s]", err.Error()))
 		return err
 	}
+	addList := make([]models.Domain, 0)
+	editList := make([]map[string]string, 0)
+	deleteList := make([]map[string]string, 0)
 	for _, domain := range domains {
 		if recordsMap[domain.Domain] == nil {
+			addList = append(addList, domain)
 			continue
 		}
 		edit := false
 		for _, recordID := range recordsMap[domain.Domain] {
 			if records[recordID]["type"] == domain.Type {
+				editList = append(editList, map[string]string{"domain": domain.Domain, "recordID": recordID, "ip": domain.Value, "type": domain.Type})
 				edit = true
+				break
 			}
 		}
-		if edit {
+		if !edit {
+			addList = append(addList, domain)
+		}
+	}
+	for id, record := range records {
+		deleteTag := true
+		for _, domain := range domains {
+			if record["name"] == domain.Domain && record["type"] == domain.Type {
+				deleteTag = false
+				break
+			}
+			if deleteTag {
+				deleteList = append(deleteList, map[string]string{"domain": record["name"], "recordID": id, "type": record["type"]})
+			}
 			
 		}
 	}
-
+	fmt.Println(addList)
+	fmt.Println(editList)
+	fmt.Println(deleteList)
 	return nil
 }
