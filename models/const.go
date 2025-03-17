@@ -5,6 +5,10 @@ import "time"
 const INTERFACE = 1
 const SCRIPT = 2
 const IPAPI = 3
+const SUCCESS = 1
+const FAILURE = 2
+const STATIC = 3
+
 
 const EXPIRETIME = time.Hour * 24
 

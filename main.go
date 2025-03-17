@@ -63,7 +63,7 @@ func main()  {
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
 	client := http.DefaultClient
-	ddns.SetCFRecord(setting.DDNS.Cloudflare.ZoneAPI, setting.DDNS.Cloudflare.RecordAPI, "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", "1.1.1.1","::1",domais, client, webLogger)
+	ddns.SetCFRecord(setting.DDNS.Cloudflare.ZoneAPI, setting.DDNS.Cloudflare.RecordAPI, "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", map[string]string{"ipv4": "1.1.1.1"},domais, client, webLogger)
 	if setting.Server.Tls != nil {
 		server.RunTLS(fmt.Sprintf(":%d", setting.Server.Tls.Port), setting.Server.Tls.Cert, setting.Server.Tls.Key)
 	}

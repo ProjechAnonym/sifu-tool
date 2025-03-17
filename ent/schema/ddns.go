@@ -21,8 +21,7 @@ func (DDNS) Fields() []ent.Field {
 		field.String("v4script").Optional().MaxLen(1000),field.String("v4interface").Optional().MaxLen(100),
 		field.String("v6script").Optional().MaxLen(1000),field.String("v6interface").Optional().MaxLen(100),
 		field.JSON("domains", []models.Domain{}),field.JSON("config", map[string]string{}),
-		field.JSON("result", map[string]string{}).Optional(),
-		field.JSON("status", map[string]int{}),field.JSON("webhook", map[string]string{}).Optional(),
+		field.JSON("webhook", map[string]string{}).Optional(),
 	}
 }
 

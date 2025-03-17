@@ -803,16 +803,6 @@ func V6interfaceContainsFold(v string) predicate.DDNS {
 	return predicate.DDNS(sql.FieldContainsFold(FieldV6interface, v))
 }
 
-// ResultIsNil applies the IsNil predicate on the "result" field.
-func ResultIsNil() predicate.DDNS {
-	return predicate.DDNS(sql.FieldIsNull(FieldResult))
-}
-
-// ResultNotNil applies the NotNil predicate on the "result" field.
-func ResultNotNil() predicate.DDNS {
-	return predicate.DDNS(sql.FieldNotNull(FieldResult))
-}
-
 // WebhookIsNil applies the IsNil predicate on the "webhook" field.
 func WebhookIsNil() predicate.DDNS {
 	return predicate.DDNS(sql.FieldIsNull(FieldWebhook))

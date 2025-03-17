@@ -1,6 +1,7 @@
 package ddns
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -99,11 +100,11 @@ func getRecordID(zoneID, api, token string, client *http.Client, logger *zap.Log
 				msg["type"] = recordType
 			}
 
-			if ip, ok := result.(map[string]any)["content"].(string); !ok {
-				logger.Error(`不存在"id"字段`)
+			if content, ok := result.(map[string]any)["content"].(string); !ok {
+				logger.Error(`不存在"content"字段`)
 				continue
 			}else{
-				msg["ip"] = ip
+				msg["content"] = content
 			}
 			
 			if name, ok := result.(map[string]any)["name"].(string); !ok {
@@ -123,7 +124,7 @@ func getRecordID(zoneID, api, token string, client *http.Client, logger *zap.Log
 	}
 	return nil, nil, nil
 }
-func SetCFRecord(zoneAPI, recordAPI, token, ipv4, ipv6 string, domains []models.Domain, client *http.Client, logger *zap.Logger) error {
+func SetCFRecord(zoneAPI, recordAPI, token string, value map[string]string, domains []models.Domain, client *http.Client, logger *zap.Logger) error {
 	zoneID, err := getZoneID(zoneAPI, token, client, logger)
 	if err != nil {
 		logger.Error(fmt.Sprintf("获取zoneID失败: [%s]", err.Error()))
@@ -135,8 +136,14 @@ func SetCFRecord(zoneAPI, recordAPI, token, ipv4, ipv6 string, domains []models.
 		return err
 	}
 	addList := make([]models.Domain, 0)
-	editList := make([]map[string]string, 0)
-	deleteList := make([]map[string]string, 0)
+	editList := make([]struct {
+		domain models.Domain 
+		id     string
+	}, 0)
+	deleteList := make([]struct {
+		domain models.Domain 
+		id     string
+	}, 0)
 	for _, domain := range domains {
 		if recordsMap[domain.Domain] == nil {
 			addList = append(addList, domain)
@@ -145,7 +152,7 @@ func SetCFRecord(zoneAPI, recordAPI, token, ipv4, ipv6 string, domains []models.
 		edit := false
 		for _, recordID := range recordsMap[domain.Domain] {
 			if records[recordID]["type"] == domain.Type {
-				editList = append(editList, map[string]string{"domain": domain.Domain, "recordID": recordID, "ip": domain.Value, "type": domain.Type})
+				editList = append(editList, struct{domain models.Domain; id string}{domain: domain, id: recordID})
 				edit = true
 				break
 			}
@@ -161,14 +168,88 @@ func SetCFRecord(zoneAPI, recordAPI, token, ipv4, ipv6 string, domains []models.
 				deleteTag = false
 				break
 			}
-			if deleteTag {
-				deleteList = append(deleteList, map[string]string{"domain": record["name"], "recordID": id, "type": record["type"]})
-			}
-			
+		}
+		if deleteTag {
+			deleteList = append(deleteList, struct{domain models.Domain; id string}{domain: domain, id: id})
 		}
 	}
 	fmt.Println(addList)
 	fmt.Println(editList)
 	fmt.Println(deleteList)
 	return nil
+}
+
+func setRecord(zoneID, recordID, api, token, operation string, domain models.Domain, client *http.Client, logger *zap.Logger) (*models.Domain, error) {
+	url := fmt.Sprintf(api, zoneID)
+	var req *http.Request
+	var err error
+	switch operation {
+	case "add":
+		content, err := json.Marshal(map[string]string{"name": domain.Domain, "type": domain.Type, "content": domain.Value})
+		if err != nil {
+			logger.Error(fmt.Sprintf("解析数据失败: [%s]", err.Error()))
+			return nil, err
+		}
+		req, err = http.NewRequest("POST", url, bytes.NewBuffer(content))
+		if err != nil {
+			logger.Error(fmt.Sprintf("创建请求失败: [%s]", err.Error()))
+			return nil, err
+		}
+	case "delete":
+		url += fmt.Sprintf("/%s", recordID)
+		req, err = http.NewRequest("DELETE", url, nil)
+		if err != nil {
+			logger.Error(fmt.Sprintf("创建请求失败: [%s]", err.Error()))
+			return nil, err
+		}
+	case "edit":
+		url += fmt.Sprintf("/%s", recordID)
+		content, err := json.Marshal(map[string]string{"name": domain.Domain, "type": domain.Type, "content": domain.Value})
+		if err != nil {
+			logger.Error(fmt.Sprintf("解析数据失败: [%s]", err.Error()))
+			return nil, err
+		}
+		req, err = http.NewRequest("PUT", url, bytes.NewBuffer(content))
+		if err != nil {
+			logger.Error(fmt.Sprintf("创建请求失败: [%s]", err.Error()))
+			return nil, err
+		}
+		
+	default:
+		logger.Error("操作类型错误")
+		return nil, fmt.Errorf("操作类型错误")
+	}
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	resp, err := client.Do(req)
+	if err != nil {
+		logger.Error(fmt.Sprintf("请求失败: [%s]", err.Error()))
+		return nil, err
+	}
+	defer resp.Body.Close()
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		logger.Error(fmt.Sprintf("读取响应失败: [%s]", err.Error()))
+		return nil, err
+	}
+	content := make(map[string]any)
+	if err := json.Unmarshal(respBody, &content); err != nil{
+		logger.Error(fmt.Sprintf("解析响应失败: [%s]", err.Error()))
+		return nil, err
+	}
+	if status, ok := content["success"].(bool); ok {
+		if status {
+			logger.Info(fmt.Sprintf("操作成功"))
+		}else{
+			if errors, ok := content["errors"].([]map[string]any); ok {
+				for _, err := range errors {
+					if msg, ok := err["message"]; ok {
+						return &models.Domain{Domain: domain.Domain, Result: msg.(string), Status: models.FAILURE, Type: domain.Type, Value: domain.Value}, nil
+					}
+				}
+			}else{
+				logger.Error("操作失败")
+			}
+		}
+	}
 }

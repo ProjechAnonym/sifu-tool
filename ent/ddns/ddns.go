@@ -35,10 +35,6 @@ const (
 	FieldDomains = "domains"
 	// FieldConfig holds the string denoting the config field in the database.
 	FieldConfig = "config"
-	// FieldResult holds the string denoting the result field in the database.
-	FieldResult = "result"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
 	// FieldWebhook holds the string denoting the webhook field in the database.
 	FieldWebhook = "webhook"
 	// Table holds the table name of the ddns in the database.
@@ -60,8 +56,6 @@ var Columns = []string{
 	FieldV6interface,
 	FieldDomains,
 	FieldConfig,
-	FieldResult,
-	FieldStatus,
 	FieldWebhook,
 }
 

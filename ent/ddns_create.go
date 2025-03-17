@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"sifu-tool/ent/ddns"
+	"sifu-tool/models"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -160,7 +161,7 @@ func (dc *DDNSCreate) SetNillableV6interface(s *string) *DDNSCreate {
 }
 
 // SetDomains sets the "domains" field.
-func (dc *DDNSCreate) SetDomains(m map[string]string) *DDNSCreate {
+func (dc *DDNSCreate) SetDomains(m []models.Domain) *DDNSCreate {
 	dc.mutation.SetDomains(m)
 	return dc
 }
@@ -168,18 +169,6 @@ func (dc *DDNSCreate) SetDomains(m map[string]string) *DDNSCreate {
 // SetConfig sets the "config" field.
 func (dc *DDNSCreate) SetConfig(m map[string]string) *DDNSCreate {
 	dc.mutation.SetConfig(m)
-	return dc
-}
-
-// SetResult sets the "result" field.
-func (dc *DDNSCreate) SetResult(m map[string]string) *DDNSCreate {
-	dc.mutation.SetResult(m)
-	return dc
-}
-
-// SetStatus sets the "status" field.
-func (dc *DDNSCreate) SetStatus(m map[string]int) *DDNSCreate {
-	dc.mutation.SetStatus(m)
 	return dc
 }
 
@@ -269,9 +258,6 @@ func (dc *DDNSCreate) check() error {
 	if _, ok := dc.mutation.Config(); !ok {
 		return &ValidationError{Name: "config", err: errors.New(`ent: missing required field "DDNS.config"`)}
 	}
-	if _, ok := dc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "DDNS.status"`)}
-	}
 	return nil
 }
 
@@ -345,14 +331,6 @@ func (dc *DDNSCreate) createSpec() (*DDNS, *sqlgraph.CreateSpec) {
 	if value, ok := dc.mutation.Config(); ok {
 		_spec.SetField(ddns.FieldConfig, field.TypeJSON, value)
 		_node.Config = value
-	}
-	if value, ok := dc.mutation.Result(); ok {
-		_spec.SetField(ddns.FieldResult, field.TypeJSON, value)
-		_node.Result = value
-	}
-	if value, ok := dc.mutation.Status(); ok {
-		_spec.SetField(ddns.FieldStatus, field.TypeJSON, value)
-		_node.Status = value
 	}
 	if value, ok := dc.mutation.Webhook(); ok {
 		_spec.SetField(ddns.FieldWebhook, field.TypeJSON, value)

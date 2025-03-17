@@ -9,6 +9,8 @@ type Domain struct {
 	Domain  string	`json:"domain"`
 	Type	string	`json:"type"`
 	Value	string	`json:"value"`
+	Result  string	`json:"result"`
+	Status  int		`json:"status"`
 }
 type Cloudflare struct {
 	ZoneAPI		string `yaml:"zoneAPI"`

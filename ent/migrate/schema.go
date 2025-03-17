@@ -34,8 +34,6 @@ var (
 		{Name: "v6interface", Type: field.TypeString, Nullable: true, Size: 100},
 		{Name: "domains", Type: field.TypeJSON},
 		{Name: "config", Type: field.TypeJSON},
-		{Name: "result", Type: field.TypeJSON, Nullable: true},
-		{Name: "status", Type: field.TypeJSON},
 		{Name: "webhook", Type: field.TypeJSON, Nullable: true},
 	}
 	// DdnSsTable holds the schema information for the "ddn_ss" table.

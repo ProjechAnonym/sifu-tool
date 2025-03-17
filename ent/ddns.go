@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"sifu-tool/ent/ddns"
+	"sifu-tool/models"
 	"strings"
 
 	"entgo.io/ent"
@@ -38,13 +39,9 @@ type DDNS struct {
 	// V6interface holds the value of the "v6interface" field.
 	V6interface string `json:"v6interface,omitempty"`
 	// Domains holds the value of the "domains" field.
-	Domains map[string]string `json:"domains,omitempty"`
+	Domains []models.Domain `json:"domains,omitempty"`
 	// Config holds the value of the "config" field.
 	Config map[string]string `json:"config,omitempty"`
-	// Result holds the value of the "result" field.
-	Result map[string]string `json:"result,omitempty"`
-	// Status holds the value of the "status" field.
-	Status map[string]int `json:"status,omitempty"`
 	// Webhook holds the value of the "webhook" field.
 	Webhook      map[string]string `json:"webhook,omitempty"`
 	selectValues sql.SelectValues
@@ -55,7 +52,7 @@ func (*DDNS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case ddns.FieldDomains, ddns.FieldConfig, ddns.FieldResult, ddns.FieldStatus, ddns.FieldWebhook:
+		case ddns.FieldDomains, ddns.FieldConfig, ddns.FieldWebhook:
 			values[i] = new([]byte)
 		case ddns.FieldID, ddns.FieldV4method, ddns.FieldV6method:
 			values[i] = new(sql.NullInt64)
@@ -158,22 +155,6 @@ func (d *DDNS) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field config: %w", err)
 				}
 			}
-		case ddns.FieldResult:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field result", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &d.Result); err != nil {
-					return fmt.Errorf("unmarshal field result: %w", err)
-				}
-			}
-		case ddns.FieldStatus:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &d.Status); err != nil {
-					return fmt.Errorf("unmarshal field status: %w", err)
-				}
-			}
 		case ddns.FieldWebhook:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field webhook", values[i])
@@ -253,12 +234,6 @@ func (d *DDNS) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("config=")
 	builder.WriteString(fmt.Sprintf("%v", d.Config))
-	builder.WriteString(", ")
-	builder.WriteString("result=")
-	builder.WriteString(fmt.Sprintf("%v", d.Result))
-	builder.WriteString(", ")
-	builder.WriteString("status=")
-	builder.WriteString(fmt.Sprintf("%v", d.Status))
 	builder.WriteString(", ")
 	builder.WriteString("webhook=")
 	builder.WriteString(fmt.Sprintf("%v", d.Webhook))

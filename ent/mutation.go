@@ -9,6 +9,7 @@ import (
 	"sifu-tool/ent/cert"
 	"sifu-tool/ent/ddns"
 	"sifu-tool/ent/predicate"
+	"sifu-tool/models"
 	"sync"
 
 	"entgo.io/ent"
@@ -372,10 +373,9 @@ type DDNSMutation struct {
 	v4interface   *string
 	v6script      *string
 	v6interface   *string
-	domains       *map[string]string
+	domains       *[]models.Domain
+	appenddomains []models.Domain
 	_config       *map[string]string
-	result        *map[string]string
-	status        *map[string]int
 	webhook       *map[string]string
 	clearedFields map[string]struct{}
 	done          bool
@@ -1014,12 +1014,13 @@ func (m *DDNSMutation) ResetV6interface() {
 }
 
 // SetDomains sets the "domains" field.
-func (m *DDNSMutation) SetDomains(value map[string]string) {
+func (m *DDNSMutation) SetDomains(value []models.Domain) {
 	m.domains = &value
+	m.appenddomains = nil
 }
 
 // Domains returns the value of the "domains" field in the mutation.
-func (m *DDNSMutation) Domains() (r map[string]string, exists bool) {
+func (m *DDNSMutation) Domains() (r []models.Domain, exists bool) {
 	v := m.domains
 	if v == nil {
 		return
@@ -1030,7 +1031,7 @@ func (m *DDNSMutation) Domains() (r map[string]string, exists bool) {
 // OldDomains returns the old "domains" field's value of the DDNS entity.
 // If the DDNS object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DDNSMutation) OldDomains(ctx context.Context) (v map[string]string, err error) {
+func (m *DDNSMutation) OldDomains(ctx context.Context) (v []models.Domain, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDomains is only allowed on UpdateOne operations")
 	}
@@ -1044,9 +1045,23 @@ func (m *DDNSMutation) OldDomains(ctx context.Context) (v map[string]string, err
 	return oldValue.Domains, nil
 }
 
+// AppendDomains adds value to the "domains" field.
+func (m *DDNSMutation) AppendDomains(value []models.Domain) {
+	m.appenddomains = append(m.appenddomains, value...)
+}
+
+// AppendedDomains returns the list of values that were appended to the "domains" field in this mutation.
+func (m *DDNSMutation) AppendedDomains() ([]models.Domain, bool) {
+	if len(m.appenddomains) == 0 {
+		return nil, false
+	}
+	return m.appenddomains, true
+}
+
 // ResetDomains resets all changes to the "domains" field.
 func (m *DDNSMutation) ResetDomains() {
 	m.domains = nil
+	m.appenddomains = nil
 }
 
 // SetConfig sets the "config" field.
@@ -1083,91 +1098,6 @@ func (m *DDNSMutation) OldConfig(ctx context.Context) (v map[string]string, err 
 // ResetConfig resets all changes to the "config" field.
 func (m *DDNSMutation) ResetConfig() {
 	m._config = nil
-}
-
-// SetResult sets the "result" field.
-func (m *DDNSMutation) SetResult(value map[string]string) {
-	m.result = &value
-}
-
-// Result returns the value of the "result" field in the mutation.
-func (m *DDNSMutation) Result() (r map[string]string, exists bool) {
-	v := m.result
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldResult returns the old "result" field's value of the DDNS entity.
-// If the DDNS object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DDNSMutation) OldResult(ctx context.Context) (v map[string]string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldResult is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldResult requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldResult: %w", err)
-	}
-	return oldValue.Result, nil
-}
-
-// ClearResult clears the value of the "result" field.
-func (m *DDNSMutation) ClearResult() {
-	m.result = nil
-	m.clearedFields[ddns.FieldResult] = struct{}{}
-}
-
-// ResultCleared returns if the "result" field was cleared in this mutation.
-func (m *DDNSMutation) ResultCleared() bool {
-	_, ok := m.clearedFields[ddns.FieldResult]
-	return ok
-}
-
-// ResetResult resets all changes to the "result" field.
-func (m *DDNSMutation) ResetResult() {
-	m.result = nil
-	delete(m.clearedFields, ddns.FieldResult)
-}
-
-// SetStatus sets the "status" field.
-func (m *DDNSMutation) SetStatus(value map[string]int) {
-	m.status = &value
-}
-
-// Status returns the value of the "status" field in the mutation.
-func (m *DDNSMutation) Status() (r map[string]int, exists bool) {
-	v := m.status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldStatus returns the old "status" field's value of the DDNS entity.
-// If the DDNS object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DDNSMutation) OldStatus(ctx context.Context) (v map[string]int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldStatus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
-	}
-	return oldValue.Status, nil
-}
-
-// ResetStatus resets all changes to the "status" field.
-func (m *DDNSMutation) ResetStatus() {
-	m.status = nil
 }
 
 // SetWebhook sets the "webhook" field.
@@ -1253,7 +1183,7 @@ func (m *DDNSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DDNSMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 13)
 	if m.v4method != nil {
 		fields = append(fields, ddns.FieldV4method)
 	}
@@ -1290,12 +1220,6 @@ func (m *DDNSMutation) Fields() []string {
 	if m._config != nil {
 		fields = append(fields, ddns.FieldConfig)
 	}
-	if m.result != nil {
-		fields = append(fields, ddns.FieldResult)
-	}
-	if m.status != nil {
-		fields = append(fields, ddns.FieldStatus)
-	}
 	if m.webhook != nil {
 		fields = append(fields, ddns.FieldWebhook)
 	}
@@ -1331,10 +1255,6 @@ func (m *DDNSMutation) Field(name string) (ent.Value, bool) {
 		return m.Domains()
 	case ddns.FieldConfig:
 		return m.Config()
-	case ddns.FieldResult:
-		return m.Result()
-	case ddns.FieldStatus:
-		return m.Status()
 	case ddns.FieldWebhook:
 		return m.Webhook()
 	}
@@ -1370,10 +1290,6 @@ func (m *DDNSMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldDomains(ctx)
 	case ddns.FieldConfig:
 		return m.OldConfig(ctx)
-	case ddns.FieldResult:
-		return m.OldResult(ctx)
-	case ddns.FieldStatus:
-		return m.OldStatus(ctx)
 	case ddns.FieldWebhook:
 		return m.OldWebhook(ctx)
 	}
@@ -1456,7 +1372,7 @@ func (m *DDNSMutation) SetField(name string, value ent.Value) error {
 		m.SetV6interface(v)
 		return nil
 	case ddns.FieldDomains:
-		v, ok := value.(map[string]string)
+		v, ok := value.([]models.Domain)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1468,20 +1384,6 @@ func (m *DDNSMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetConfig(v)
-		return nil
-	case ddns.FieldResult:
-		v, ok := value.(map[string]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetResult(v)
-		return nil
-	case ddns.FieldStatus:
-		v, ok := value.(map[string]int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetStatus(v)
 		return nil
 	case ddns.FieldWebhook:
 		v, ok := value.(map[string]string)
@@ -1577,9 +1479,6 @@ func (m *DDNSMutation) ClearedFields() []string {
 	if m.FieldCleared(ddns.FieldV6interface) {
 		fields = append(fields, ddns.FieldV6interface)
 	}
-	if m.FieldCleared(ddns.FieldResult) {
-		fields = append(fields, ddns.FieldResult)
-	}
 	if m.FieldCleared(ddns.FieldWebhook) {
 		fields = append(fields, ddns.FieldWebhook)
 	}
@@ -1627,9 +1526,6 @@ func (m *DDNSMutation) ClearField(name string) error {
 	case ddns.FieldV6interface:
 		m.ClearV6interface()
 		return nil
-	case ddns.FieldResult:
-		m.ClearResult()
-		return nil
 	case ddns.FieldWebhook:
 		m.ClearWebhook()
 		return nil
@@ -1676,12 +1572,6 @@ func (m *DDNSMutation) ResetField(name string) error {
 		return nil
 	case ddns.FieldConfig:
 		m.ResetConfig()
-		return nil
-	case ddns.FieldResult:
-		m.ResetResult()
-		return nil
-	case ddns.FieldStatus:
-		m.ResetStatus()
 		return nil
 	case ddns.FieldWebhook:
 		m.ResetWebhook()

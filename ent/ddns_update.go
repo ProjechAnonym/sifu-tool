@@ -8,9 +8,11 @@ import (
 	"fmt"
 	"sifu-tool/ent/ddns"
 	"sifu-tool/ent/predicate"
+	"sifu-tool/models"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 )
 
@@ -242,32 +244,20 @@ func (du *DDNSUpdate) ClearV6interface() *DDNSUpdate {
 }
 
 // SetDomains sets the "domains" field.
-func (du *DDNSUpdate) SetDomains(m map[string]string) *DDNSUpdate {
+func (du *DDNSUpdate) SetDomains(m []models.Domain) *DDNSUpdate {
 	du.mutation.SetDomains(m)
+	return du
+}
+
+// AppendDomains appends m to the "domains" field.
+func (du *DDNSUpdate) AppendDomains(m []models.Domain) *DDNSUpdate {
+	du.mutation.AppendDomains(m)
 	return du
 }
 
 // SetConfig sets the "config" field.
 func (du *DDNSUpdate) SetConfig(m map[string]string) *DDNSUpdate {
 	du.mutation.SetConfig(m)
-	return du
-}
-
-// SetResult sets the "result" field.
-func (du *DDNSUpdate) SetResult(m map[string]string) *DDNSUpdate {
-	du.mutation.SetResult(m)
-	return du
-}
-
-// ClearResult clears the value of the "result" field.
-func (du *DDNSUpdate) ClearResult() *DDNSUpdate {
-	du.mutation.ClearResult()
-	return du
-}
-
-// SetStatus sets the "status" field.
-func (du *DDNSUpdate) SetStatus(m map[string]int) *DDNSUpdate {
-	du.mutation.SetStatus(m)
 	return du
 }
 
@@ -441,17 +431,13 @@ func (du *DDNSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := du.mutation.Domains(); ok {
 		_spec.SetField(ddns.FieldDomains, field.TypeJSON, value)
 	}
+	if value, ok := du.mutation.AppendedDomains(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, ddns.FieldDomains, value)
+		})
+	}
 	if value, ok := du.mutation.Config(); ok {
 		_spec.SetField(ddns.FieldConfig, field.TypeJSON, value)
-	}
-	if value, ok := du.mutation.Result(); ok {
-		_spec.SetField(ddns.FieldResult, field.TypeJSON, value)
-	}
-	if du.mutation.ResultCleared() {
-		_spec.ClearField(ddns.FieldResult, field.TypeJSON)
-	}
-	if value, ok := du.mutation.Status(); ok {
-		_spec.SetField(ddns.FieldStatus, field.TypeJSON, value)
 	}
 	if value, ok := du.mutation.Webhook(); ok {
 		_spec.SetField(ddns.FieldWebhook, field.TypeJSON, value)
@@ -694,32 +680,20 @@ func (duo *DDNSUpdateOne) ClearV6interface() *DDNSUpdateOne {
 }
 
 // SetDomains sets the "domains" field.
-func (duo *DDNSUpdateOne) SetDomains(m map[string]string) *DDNSUpdateOne {
+func (duo *DDNSUpdateOne) SetDomains(m []models.Domain) *DDNSUpdateOne {
 	duo.mutation.SetDomains(m)
+	return duo
+}
+
+// AppendDomains appends m to the "domains" field.
+func (duo *DDNSUpdateOne) AppendDomains(m []models.Domain) *DDNSUpdateOne {
+	duo.mutation.AppendDomains(m)
 	return duo
 }
 
 // SetConfig sets the "config" field.
 func (duo *DDNSUpdateOne) SetConfig(m map[string]string) *DDNSUpdateOne {
 	duo.mutation.SetConfig(m)
-	return duo
-}
-
-// SetResult sets the "result" field.
-func (duo *DDNSUpdateOne) SetResult(m map[string]string) *DDNSUpdateOne {
-	duo.mutation.SetResult(m)
-	return duo
-}
-
-// ClearResult clears the value of the "result" field.
-func (duo *DDNSUpdateOne) ClearResult() *DDNSUpdateOne {
-	duo.mutation.ClearResult()
-	return duo
-}
-
-// SetStatus sets the "status" field.
-func (duo *DDNSUpdateOne) SetStatus(m map[string]int) *DDNSUpdateOne {
-	duo.mutation.SetStatus(m)
 	return duo
 }
 
@@ -923,17 +897,13 @@ func (duo *DDNSUpdateOne) sqlSave(ctx context.Context) (_node *DDNS, err error) 
 	if value, ok := duo.mutation.Domains(); ok {
 		_spec.SetField(ddns.FieldDomains, field.TypeJSON, value)
 	}
+	if value, ok := duo.mutation.AppendedDomains(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, ddns.FieldDomains, value)
+		})
+	}
 	if value, ok := duo.mutation.Config(); ok {
 		_spec.SetField(ddns.FieldConfig, field.TypeJSON, value)
-	}
-	if value, ok := duo.mutation.Result(); ok {
-		_spec.SetField(ddns.FieldResult, field.TypeJSON, value)
-	}
-	if duo.mutation.ResultCleared() {
-		_spec.ClearField(ddns.FieldResult, field.TypeJSON)
-	}
-	if value, ok := duo.mutation.Status(); ok {
-		_spec.SetField(ddns.FieldStatus, field.TypeJSON, value)
 	}
 	if value, ok := duo.mutation.Webhook(); ok {
 		_spec.SetField(ddns.FieldWebhook, field.TypeJSON, value)
