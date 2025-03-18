@@ -8,7 +8,8 @@ const IPAPI = 3
 const SUCCESS = 1
 const FAILURE = 2
 const STATIC = 3
-
+const IPV4 = "A"
+const IPV6 = "AAAA"
 
 const EXPIRETIME = time.Hour * 24
 

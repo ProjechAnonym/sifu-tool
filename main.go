@@ -53,17 +53,28 @@ func main()  {
 		entClient.Close()	
 		buntClient.Close()
 	}()
-	domais := []models.Domain{models.Domain{Domain: "*.lzhlovelcl.top", Type: "A", Value: "1.1.1.1"},models.Domain{Domain: "2.lzhlovelcl.top", Type: "A", Value: "1.1.1.1"}}
+	domais := []models.Domain{
+		models.Domain{Domain: "3.lzhlovelcl.top", Type: "A"},
+		models.Domain{Domain: "2.lzhlovelcl.top", Type: "A", Value: "3.3.3.3"},
+		models.Domain{Domain: "lzhlovelcl.top", Type: "AAAA", Value: "240e:379:17f:7400:be24:11ff:fe4d:994c"},
+		models.Domain{Domain: "*.lzhlovelcl.top", Type: "AAAA", Value: "240e:379:17f:7400:be24:11ff:fe4d:994c"},
+	}
 	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
 	server.Use(middleware.Logger(webLogger), middleware.Recovery(true, webLogger), cors.New(middleware.Cors(*domains)))
 	api := server.Group("/api")
 	route.SettingLogin(api, setting.User, webLogger)
 	route.SettingDDNS(api, setting.User.Secret, webLogger)
+	
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
 	client := http.DefaultClient
-	ddns.SetCFRecord(setting.DDNS.Cloudflare.ZoneAPI, setting.DDNS.Cloudflare.RecordAPI, "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", map[string]string{"ipv4": "1.1.1.1"},domais, client, webLogger)
+	b,e:=ddns.SetCFRecord(setting.DDNS.Cloudflare.ZoneAPI, setting.DDNS.Cloudflare.RecordAPI, "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", map[string]string{models.IPV4: "1.1.1.1", models.IPV6: "240e:379:17f:7400:be24:11ff:fe4d:994c"},domais, client, webLogger)
+	for _, i := range(b){
+		fmt.Println(*i)
+	}
+	fmt.Println(e)
+	
 	if setting.Server.Tls != nil {
 		server.RunTLS(fmt.Sprintf(":%d", setting.Server.Tls.Port), setting.Server.Tls.Cert, setting.Server.Tls.Key)
 	}
