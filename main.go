@@ -54,8 +54,10 @@ func main()  {
 		buntClient.Close()
 	}()
 	domais := []models.Domain{
-		models.Domain{Domain: "3.lzhlovelcl.top", Type: "A"},
-		models.Domain{Domain: "2.lzhlovelcl.top", Type: "A", Value: "3.3.3.3"},
+		models.Domain{Domain: "3.lzhlovelcl.top", Type: "AAAA"},
+		models.Domain{Domain: "4.lzhlovelcl.top", Type: "AAAA"},
+		models.Domain{Domain: "3.lzhlovelcl.top", Type: "A", Value: "1.1.1.1"},
+		models.Domain{Domain: "2.lzhlovelcl.top", Type: "A", Value: "1.1.1.1"},
 		models.Domain{Domain: "lzhlovelcl.top", Type: "AAAA", Value: "240e:379:17f:7400:be24:11ff:fe4d:994c"},
 		models.Domain{Domain: "*.lzhlovelcl.top", Type: "AAAA", Value: "240e:379:17f:7400:be24:11ff:fe4d:994c"},
 	}
@@ -69,7 +71,7 @@ func main()  {
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
 	client := http.DefaultClient
-	b,e:=ddns.SetCFRecord(setting.DDNS.Cloudflare.ZoneAPI, setting.DDNS.Cloudflare.RecordAPI, "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", map[string]string{models.IPV4: "1.1.1.1", models.IPV6: "240e:379:17f:7400:be24:11ff:fe4d:994c"},domais, client, webLogger)
+	b,e:=ddns.SetCFRecord(setting.DDNS.Cloudflare.API, "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm", map[string]string{models.IPV4: "3.3.3.3", models.IPV6: "240e:379:17f:7400:be24:11ff:fe4d:994c"},domais, client, webLogger)
 	for _, i := range(b){
 		fmt.Println(*i)
 	}

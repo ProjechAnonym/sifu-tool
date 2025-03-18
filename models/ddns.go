@@ -13,6 +13,5 @@ type Domain struct {
 	Status  int		`json:"status"`
 }
 type Cloudflare struct {
-	ZoneAPI		string `yaml:"zoneAPI"`
-	RecordAPI	string `yaml:"recordAPI"`
+	API		string `yaml:"api"`
 }

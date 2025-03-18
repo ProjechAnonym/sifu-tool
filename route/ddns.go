@@ -22,4 +22,7 @@ func SettingDDNS(api *gin.RouterGroup, secret string, logger *zap.Logger) {
 		}
 		c.JSON(http.StatusOK, gin.H{"message": inerfaceIPs})
 	})
+	api.POST("/ddns", middleware.Jwt(secret, logger), func(ctx *gin.Context){
+		
+	})
 }
