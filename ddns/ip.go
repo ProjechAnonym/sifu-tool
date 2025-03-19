@@ -42,12 +42,12 @@ func IPfromInterface(interfaceName, reStr string, logger *zap.Logger) (string, e
 	targetInterface, err := net.InterfaceByName(interfaceName)
 	if err != nil {
 		logger.Error(fmt.Sprintf(`获取网卡"%s"失败: [%s]`, interfaceName, err.Error()))
-		return "", fmt.Errorf(`获取网卡"%s"失败`, interfaceName)
+		return "", fmt.Errorf(`获取网卡"%s"失败: [%s]`, interfaceName, err.Error())
 	}
 	addrs, err := targetInterface.Addrs()
 	if err != nil {
 		logger.Error(fmt.Sprintf("获取网卡地址失败: [%s]", err.Error()))
-		return "", fmt.Errorf("获取网卡地址失败")
+		return "", fmt.Errorf("获取网卡地址失败: [%s]", err.Error())
 	}
 	for _, addr := range addrs {
 		reAddr := regexp.MustCompile(reStr)
@@ -58,7 +58,7 @@ func IPfromInterface(interfaceName, reStr string, logger *zap.Logger) (string, e
 		address, _, err := net.ParseCIDR(ip)
 		if err != nil {
 			logger.Error(fmt.Sprintf(`解析网卡"%s"地址"%s"失败: [%s]`, targetInterface.Name, addr.String(), err.Error()))
-			return "", fmt.Errorf(`解析网卡"%s"地址"%s"失败`, targetInterface.Name, addr.String())
+			return "", fmt.Errorf(`解析网卡"%s"地址"%s"失败: [%s]`, targetInterface.Name, addr.String(), err.Error())
 		}
 		return address.String(), nil
 	}

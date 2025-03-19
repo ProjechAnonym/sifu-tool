@@ -178,6 +178,12 @@ func (dc *DDNSCreate) SetWebhook(m map[string]string) *DDNSCreate {
 	return dc
 }
 
+// SetTags sets the "tags" field.
+func (dc *DDNSCreate) SetTags(s []string) *DDNSCreate {
+	dc.mutation.SetTags(s)
+	return dc
+}
+
 // Mutation returns the DDNSMutation object of the builder.
 func (dc *DDNSCreate) Mutation() *DDNSMutation {
 	return dc.mutation
@@ -258,6 +264,9 @@ func (dc *DDNSCreate) check() error {
 	if _, ok := dc.mutation.Config(); !ok {
 		return &ValidationError{Name: "config", err: errors.New(`ent: missing required field "DDNS.config"`)}
 	}
+	if _, ok := dc.mutation.Tags(); !ok {
+		return &ValidationError{Name: "tags", err: errors.New(`ent: missing required field "DDNS.tags"`)}
+	}
 	return nil
 }
 
@@ -335,6 +344,10 @@ func (dc *DDNSCreate) createSpec() (*DDNS, *sqlgraph.CreateSpec) {
 	if value, ok := dc.mutation.Webhook(); ok {
 		_spec.SetField(ddns.FieldWebhook, field.TypeJSON, value)
 		_node.Webhook = value
+	}
+	if value, ok := dc.mutation.Tags(); ok {
+		_spec.SetField(ddns.FieldTags, field.TypeJSON, value)
+		_node.Tags = value
 	}
 	return _node, _spec
 }

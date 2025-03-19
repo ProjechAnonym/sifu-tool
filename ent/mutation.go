@@ -377,6 +377,8 @@ type DDNSMutation struct {
 	appenddomains []models.Domain
 	_config       *map[string]string
 	webhook       *map[string]string
+	tags          *[]string
+	appendtags    []string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*DDNS, error)
@@ -1149,6 +1151,57 @@ func (m *DDNSMutation) ResetWebhook() {
 	delete(m.clearedFields, ddns.FieldWebhook)
 }
 
+// SetTags sets the "tags" field.
+func (m *DDNSMutation) SetTags(s []string) {
+	m.tags = &s
+	m.appendtags = nil
+}
+
+// Tags returns the value of the "tags" field in the mutation.
+func (m *DDNSMutation) Tags() (r []string, exists bool) {
+	v := m.tags
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTags returns the old "tags" field's value of the DDNS entity.
+// If the DDNS object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DDNSMutation) OldTags(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTags is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTags requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTags: %w", err)
+	}
+	return oldValue.Tags, nil
+}
+
+// AppendTags adds s to the "tags" field.
+func (m *DDNSMutation) AppendTags(s []string) {
+	m.appendtags = append(m.appendtags, s...)
+}
+
+// AppendedTags returns the list of values that were appended to the "tags" field in this mutation.
+func (m *DDNSMutation) AppendedTags() ([]string, bool) {
+	if len(m.appendtags) == 0 {
+		return nil, false
+	}
+	return m.appendtags, true
+}
+
+// ResetTags resets all changes to the "tags" field.
+func (m *DDNSMutation) ResetTags() {
+	m.tags = nil
+	m.appendtags = nil
+}
+
 // Where appends a list predicates to the DDNSMutation builder.
 func (m *DDNSMutation) Where(ps ...predicate.DDNS) {
 	m.predicates = append(m.predicates, ps...)
@@ -1183,7 +1236,7 @@ func (m *DDNSMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *DDNSMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.v4method != nil {
 		fields = append(fields, ddns.FieldV4method)
 	}
@@ -1223,6 +1276,9 @@ func (m *DDNSMutation) Fields() []string {
 	if m.webhook != nil {
 		fields = append(fields, ddns.FieldWebhook)
 	}
+	if m.tags != nil {
+		fields = append(fields, ddns.FieldTags)
+	}
 	return fields
 }
 
@@ -1257,6 +1313,8 @@ func (m *DDNSMutation) Field(name string) (ent.Value, bool) {
 		return m.Config()
 	case ddns.FieldWebhook:
 		return m.Webhook()
+	case ddns.FieldTags:
+		return m.Tags()
 	}
 	return nil, false
 }
@@ -1292,6 +1350,8 @@ func (m *DDNSMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldConfig(ctx)
 	case ddns.FieldWebhook:
 		return m.OldWebhook(ctx)
+	case ddns.FieldTags:
+		return m.OldTags(ctx)
 	}
 	return nil, fmt.Errorf("unknown DDNS field %s", name)
 }
@@ -1391,6 +1451,13 @@ func (m *DDNSMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetWebhook(v)
+		return nil
+	case ddns.FieldTags:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTags(v)
 		return nil
 	}
 	return fmt.Errorf("unknown DDNS field %s", name)
@@ -1575,6 +1642,9 @@ func (m *DDNSMutation) ResetField(name string) error {
 		return nil
 	case ddns.FieldWebhook:
 		m.ResetWebhook()
+		return nil
+	case ddns.FieldTags:
+		m.ResetTags()
 		return nil
 	}
 	return fmt.Errorf("unknown DDNS field %s", name)

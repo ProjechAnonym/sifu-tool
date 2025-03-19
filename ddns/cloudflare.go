@@ -52,7 +52,7 @@ func getZoneID(api, token string, client *http.Client, logger *zap.Logger) (stri
 	}
 	return "", fmt.Errorf("获取zoneID失败")
 }
-func getRecordID(zoneID, api, token string, client *http.Client, logger *zap.Logger) (map[string]*models.Domain, map[string][]string, error){
+func getRecordID(zoneID, api, token string, client *http.Client, logger *zap.Logger) (map[string]models.Domain, map[string][]string, error){
 	api += fmt.Sprintf("/%s/dns_records", zoneID)
 	req, err := http.NewRequest("GET", api, nil)
 	if err != nil {
@@ -84,7 +84,7 @@ func getRecordID(zoneID, api, token string, client *http.Client, logger *zap.Log
 		return nil, nil, fmt.Errorf(`不存在"result"字段`)
 	}
 	records := make(map[string][]string)
-	domains := make(map[string]*models.Domain)
+	domains := make(map[string]models.Domain)
 	if len(results) != 0 {
 		for _, result := range results {
 			id, ok := result.(map[string]any)[CFID].(string)
@@ -101,12 +101,18 @@ func getRecordID(zoneID, api, token string, client *http.Client, logger *zap.Log
 			}else{
 				domain.Type = recordType
 			}
+			if ttl, ok := result.(map[string]any)[CFTTL].(float64); !ok {
+				logger.Error(`不存在"ttl"字段`)
+				continue
+			}else{
+				domain.TTL = int(ttl)
+			}
 
 			if content, ok := result.(map[string]any)[CFVALUE].(string); !ok {
 				logger.Error(`不存在"content"字段`)
 				continue
 			}else{
-				domain.Value = content
+				domain.Record = content
 			}
 			
 			if name, ok := result.(map[string]any)["name"].(string); !ok {
@@ -120,22 +126,22 @@ func getRecordID(zoneID, api, token string, client *http.Client, logger *zap.Log
 					records[name] = append(records[name], id)
 				}
 			}
-			domains[id] = &domain
+			domains[id] = domain
 		}
 		return domains, records, nil
 	}
 	return nil, nil, nil
 }
-func SetCFRecord(api, token string, value map[string]string, editDomains []models.Domain, client *http.Client, logger *zap.Logger) ([]*models.Domain, error) {
+func CloudFlare(api, token string, editDomains []models.Domain, client *http.Client, logger *zap.Logger) ([]models.Domain, error) {
 	zoneID, err := getZoneID(api, token, client, logger)
 	if err != nil {
 		logger.Error(fmt.Sprintf("获取zoneID失败: [%s]", err.Error()))
-		return nil, err
+		return editDomains, err
 	}
 	domains, records, err := getRecordID(zoneID, api, token, client, logger)
 	if err != nil {
 		logger.Error(fmt.Sprintf("获取recordID失败: [%s]", err.Error()))
-		return nil, err
+		return editDomains, err
 	}
 	addList := make([]models.Domain, 0)
 	editList := make([]struct {
@@ -152,9 +158,10 @@ func SetCFRecord(api, token string, value map[string]string, editDomains []model
 			continue
 		}
 		edit := false
-		for _, recordID := range records[domain.Domain] {
-			if domains[recordID].Type == domain.Type {
-				editList = append(editList, struct{domain models.Domain; id string}{domain: domain, id: recordID})
+		for _, id := range records[domain.Domain] {
+			if domains[id].Type == domain.Type {
+				domain.Record = domains[id].Record
+				editList = append(editList, struct{domain models.Domain; id string}{domain: domain, id: id})
 				edit = true
 				break
 			}
@@ -172,13 +179,13 @@ func SetCFRecord(api, token string, value map[string]string, editDomains []model
 			}
 		}
 		if deleteTag {
-			deleteList = append(deleteList, struct{domain models.Domain; id string}{domain: *domains[id], id: id})
+			deleteList = append(deleteList, struct{domain models.Domain; id string}{domain: domains[id], id: id})
 		}
 	}
 	var jobs sync.WaitGroup
-	itemChannel := make(chan *models.Domain, 10)
+	itemChannel := make(chan models.Domain, 10)
 	countChannel := make(chan int, 10)
-	domainList := make([]*models.Domain, 0)
+	domainList := make([]models.Domain, 0)
 	jobs.Add(1)
 	go func() {
 		defer func(){
@@ -209,7 +216,7 @@ func SetCFRecord(api, token string, value map[string]string, editDomains []model
 				countChannel <- 1
 				jobs.Done()
 			}()
-			item, err := setCFRecord(zoneID, "", api, token, value[domain.Type], "add", domain, client, logger)
+			item, err := setCFRecord(zoneID, "", api, token, "add", domain, client, logger)
 			if err != nil {
 				logger.Error(fmt.Sprintf("添加记录失败: [%s]", err.Error()))
 				item.Result = err.Error()
@@ -224,7 +231,7 @@ func SetCFRecord(api, token string, value map[string]string, editDomains []model
 				countChannel <- 1
 				jobs.Done()
 			}()
-			item, err := setCFRecord(zoneID, editItem.id, api, token, value[editItem.domain.Type], "edit", editItem.domain, client, logger)
+			item, err := setCFRecord(zoneID, editItem.id, api, token, "edit", editItem.domain, client, logger)
 			if err != nil {
 				logger.Error(fmt.Sprintf("修改记录失败: [%s]", err.Error()))
 				item.Result = err.Error()
@@ -239,7 +246,7 @@ func SetCFRecord(api, token string, value map[string]string, editDomains []model
 				countChannel <- 1
 				jobs.Done()
 			}()
-			item, err := setCFRecord(zoneID, deleteItem.id, api, token, value[deleteItem.domain.Type], "delete", deleteItem.domain, client, logger)
+			item, err := setCFRecord(zoneID, deleteItem.id, api, token, "delete", deleteItem.domain, client, logger)
 			if err != nil {
 				logger.Error(fmt.Sprintf("删除记录失败: [%s]", err.Error()))
 				item.Result = err.Error()
@@ -252,11 +259,11 @@ func SetCFRecord(api, token string, value map[string]string, editDomains []model
 	return domainList, nil
 }
 
-func setCFRecord(zoneID, recordID, api, token, value, operation string, domain models.Domain, client *http.Client, logger *zap.Logger) (*models.Domain, error) {
-	if domain.Value == value && operation == "edit" {
+func setCFRecord(zoneID, recordID, api, token, operation string, domain models.Domain, client *http.Client, logger *zap.Logger) (models.Domain, error) {
+	if domain.Value == domain.Record && operation == "edit" {
 		domain.Status = models.STATIC
 		domain.Result = "与托管商记录一致"
-		return &domain, nil
+		return domain, nil
 	}
 	url := api + fmt.Sprintf("/%s/dns_records", zoneID)
 	var req *http.Request
@@ -265,15 +272,15 @@ func setCFRecord(zoneID, recordID, api, token, value, operation string, domain m
 	switch operation {
 	case "add":
 		result = "添加域名记录"
-		content, err := json.Marshal(map[string]string{CFNAME: domain.Domain, CFTYPE: domain.Type, CFVALUE: value})
+		content, err := json.Marshal(map[string]any{CFNAME: domain.Domain, CFTYPE: domain.Type, CFVALUE: domain.Value, CFTTL: domain.TTL})
 		if err != nil {
 			logger.Error(fmt.Sprintf("解析数据失败: [%s]", err.Error()))
-			return &domain, err
+			return domain, err
 		}
 		req, err = http.NewRequest("POST", url, bytes.NewBuffer(content))
 		if err != nil {
 			logger.Error(fmt.Sprintf("创建请求失败: [%s]", err.Error()))
-			return &domain, err
+			return domain, err
 		}
 	case "delete":
 		result = "删除域名记录"
@@ -281,60 +288,60 @@ func setCFRecord(zoneID, recordID, api, token, value, operation string, domain m
 		req, err = http.NewRequest("DELETE", url, nil)
 		if err != nil {
 			logger.Error(fmt.Sprintf("创建请求失败: [%s]", err.Error()))
-			return &domain, err
+			return domain, err
 		}
 	case "edit":
 		result = "修改域名记录"
 		url += fmt.Sprintf("/%s", recordID)
-		content, err := json.Marshal(map[string]string{CFNAME: domain.Domain, CFTYPE: domain.Type, CFVALUE: value})
+		content, err := json.Marshal(map[string]any{CFNAME: domain.Domain, CFTYPE: domain.Type, CFVALUE: domain.Value, CFTTL: domain.TTL})
 		if err != nil {
 			logger.Error(fmt.Sprintf("解析数据失败: [%s]", err.Error()))
-			return &domain, err
+			return domain, err
 		}
 		req, err = http.NewRequest("PUT", url, bytes.NewBuffer(content))
 		if err != nil {
 			logger.Error(fmt.Sprintf("创建请求失败: [%s]", err.Error()))
-			return &domain, err
+			return domain, err
 		}
 		
 	default:
 		logger.Error("操作类型错误")
-		return &domain, fmt.Errorf("操作类型错误")
+		return domain, fmt.Errorf("操作类型错误")
 	}
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Content-Type", "application/json")
 	resp, err := client.Do(req)
 	if err != nil {
 		logger.Error(fmt.Sprintf("请求失败: [%s]", err.Error()))
-		return &domain, err
+		return domain, err
 	}
 	defer resp.Body.Close()
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		logger.Error(fmt.Sprintf("读取响应失败: [%s]", err.Error()))
-		return &domain, err
+		return domain, err
 	}
 	content := make(map[string]any)
 	if err := json.Unmarshal(respBody, &content); err != nil{
 		logger.Error(fmt.Sprintf("解析响应失败: [%s]", err.Error()))
-		return &domain, err
+		return domain, err
 	}
 	if status, ok := content["success"].(bool); ok {
 		if status {
-			return &models.Domain{Domain: domain.Domain, Result: fmt.Sprintf("%s成功", result), Status: models.SUCCESS, Type: domain.Type, Value: value}, nil
+			domain.Result = fmt.Sprintf("%s成功", result)
+			domain.Status = map[string]int{"add": models.SUCCESS, "edit": models.SUCCESS, "delete": models.DELETE}[operation]
+			domain.Record = domain.Value
+			return domain, nil
 		}else{
-			if errors, ok := content["errors"].([]map[string]any); ok {
-				for _, err := range errors {
-					if msg, ok := err["message"].(string); ok {
-						return &models.Domain{Domain: domain.Domain, Result: msg, Status: models.FAILURE, Type: domain.Type, Value: domain.Value}, fmt.Errorf("%s", msg)
-					}else{
-						return &models.Domain{Domain: domain.Domain, Result: fmt.Sprintf(`%s失败, 不存在"message"字段`, result), Status: models.FAILURE, Type: domain.Type, Value: domain.Value}, fmt.Errorf(`不存在"message"字段`)
-					}
-				}
-			}else{
-				return &models.Domain{Domain: domain.Domain, Result: fmt.Sprintf(`%s失败, 不存在"errors"字段`, result), Status: models.FAILURE, Type: domain.Type, Value: domain.Value}, fmt.Errorf(`不存在"errors"字段`)
+			domain.Status = models.FAILURE
+			response, err := json.MarshalIndent(content, "", "  ")
+			if err != nil {
+				logger.Error(fmt.Sprintf("Json序列化响应失败: [%s]", err.Error()))
+				return domain, err
 			}
+			return domain, fmt.Errorf("%s失败:\n[%s]", result, string(response))
 		}
 	}
-	return &models.Domain{Domain: domain.Domain, Result: fmt.Sprintf(`%s失败, 不存在"success"字段`, result), Status: models.FAILURE, Type: domain.Type, Value: domain.Value}, fmt.Errorf(`不存在"success"字段`)
+	domain.Status = models.FAILURE
+	return domain, fmt.Errorf(`%s失败, 不存在"success"字段`, result)
 }

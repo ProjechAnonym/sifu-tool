@@ -35,6 +35,7 @@ var (
 		{Name: "domains", Type: field.TypeJSON},
 		{Name: "config", Type: field.TypeJSON},
 		{Name: "webhook", Type: field.TypeJSON, Nullable: true},
+		{Name: "tags", Type: field.TypeJSON},
 	}
 	// DdnSsTable holds the schema information for the "ddn_ss" table.
 	DdnSsTable = &schema.Table{

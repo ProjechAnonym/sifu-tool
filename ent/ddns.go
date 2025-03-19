@@ -43,7 +43,9 @@ type DDNS struct {
 	// Config holds the value of the "config" field.
 	Config map[string]string `json:"config,omitempty"`
 	// Webhook holds the value of the "webhook" field.
-	Webhook      map[string]string `json:"webhook,omitempty"`
+	Webhook map[string]string `json:"webhook,omitempty"`
+	// Tags holds the value of the "tags" field.
+	Tags         []string `json:"tags,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -52,7 +54,7 @@ func (*DDNS) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case ddns.FieldDomains, ddns.FieldConfig, ddns.FieldWebhook:
+		case ddns.FieldDomains, ddns.FieldConfig, ddns.FieldWebhook, ddns.FieldTags:
 			values[i] = new([]byte)
 		case ddns.FieldID, ddns.FieldV4method, ddns.FieldV6method:
 			values[i] = new(sql.NullInt64)
@@ -163,6 +165,14 @@ func (d *DDNS) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field webhook: %w", err)
 				}
 			}
+		case ddns.FieldTags:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field tags", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &d.Tags); err != nil {
+					return fmt.Errorf("unmarshal field tags: %w", err)
+				}
+			}
 		default:
 			d.selectValues.Set(columns[i], values[i])
 		}
@@ -237,6 +247,9 @@ func (d *DDNS) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("webhook=")
 	builder.WriteString(fmt.Sprintf("%v", d.Webhook))
+	builder.WriteString(", ")
+	builder.WriteString("tags=")
+	builder.WriteString(fmt.Sprintf("%v", d.Tags))
 	builder.WriteByte(')')
 	return builder.String()
 }
