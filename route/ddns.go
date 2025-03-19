@@ -1,8 +1,10 @@
 package route
 
 import (
+	"fmt"
 	"net/http"
 	"sifu-tool/controller"
+	"sifu-tool/ent"
 	"sifu-tool/middleware"
 	"sifu-tool/models"
 
@@ -10,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func SettingDDNS(api *gin.RouterGroup, secret string, logger *zap.Logger) {
+func SettingDDNS(api *gin.RouterGroup, secret string, resolver map[string]map[string]string, entClient *ent.Client, logger *zap.Logger) {
 	api.POST("/interface", middleware.Jwt(secret, logger), func(c *gin.Context) {
 		inerfaceIPs, errors := controller.GetInterfaceIPs(logger)
 		errs := make([]string, len(errors))
@@ -41,6 +43,14 @@ func SettingDDNS(api *gin.RouterGroup, secret string, logger *zap.Logger) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "域名列表和托管商配置不能为空"})
 			return
 		}
-		// a, err := controller.AddJobs(form, "", logger)
+
+		result, err := controller.AddJobs(form, form.Config[models.RESOLVER], resolver[form.Config[models.RESOLVER]][models.CFAPI], entClient, logger)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("添加任务失败: [%s]", err.Error())})
+			return
+		} else {
+			ctx.JSON(http.StatusOK, gin.H{"message": "添加任务成功", "result": result})
+			return
+		}
 	})
 }

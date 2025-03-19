@@ -339,9 +339,9 @@ func setCFRecord(zoneID, recordID, api, token, operation string, domain models.D
 				logger.Error(fmt.Sprintf("Json序列化响应失败: [%s]", err.Error()))
 				return domain, err
 			}
-			return domain, fmt.Errorf("%s失败:\n[%s]", result, string(response))
+			return domain, fmt.Errorf("%s", string(response))
 		}
 	}
 	domain.Status = models.FAILURE
-	return domain, fmt.Errorf(`%s失败, 不存在"success"字段`, result)
+	return domain, fmt.Errorf(`不存在"success"字段`)
 }

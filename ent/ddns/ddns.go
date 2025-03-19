@@ -37,8 +37,6 @@ const (
 	FieldConfig = "config"
 	// FieldWebhook holds the string denoting the webhook field in the database.
 	FieldWebhook = "webhook"
-	// FieldTags holds the string denoting the tags field in the database.
-	FieldTags = "tags"
 	// Table holds the table name of the ddns in the database.
 	Table = "ddn_ss"
 )
@@ -59,7 +57,6 @@ var Columns = []string{
 	FieldDomains,
 	FieldConfig,
 	FieldWebhook,
-	FieldTags,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

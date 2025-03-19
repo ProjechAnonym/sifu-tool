@@ -16,5 +16,6 @@ ddns:
   v6api:
     # - https://api6.ipify.org?format=json
     - https://6.ipw.cn
-  cloudflare:
-    api: https://api.cloudflare.com/client/v4/zones
+  resolver:
+    cloudflare:
+      api: https://api.cloudflare.com/client/v4/zones

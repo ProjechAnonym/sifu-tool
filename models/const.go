@@ -12,6 +12,10 @@ const DELETE = 4
 const IPV4 = "A"
 const IPV6 = "AAAA"
 
+const RESOLVER = "resolver"
+const CF = "cloudflare"
+const CFTOKEN = "token"
+const CFAPI = "api"
 
 
 const EXPIRETIME = time.Hour * 24

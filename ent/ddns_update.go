@@ -273,18 +273,6 @@ func (du *DDNSUpdate) ClearWebhook() *DDNSUpdate {
 	return du
 }
 
-// SetTags sets the "tags" field.
-func (du *DDNSUpdate) SetTags(s []string) *DDNSUpdate {
-	du.mutation.SetTags(s)
-	return du
-}
-
-// AppendTags appends s to the "tags" field.
-func (du *DDNSUpdate) AppendTags(s []string) *DDNSUpdate {
-	du.mutation.AppendTags(s)
-	return du
-}
-
 // Mutation returns the DDNSMutation object of the builder.
 func (du *DDNSUpdate) Mutation() *DDNSMutation {
 	return du.mutation
@@ -456,14 +444,6 @@ func (du *DDNSUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if du.mutation.WebhookCleared() {
 		_spec.ClearField(ddns.FieldWebhook, field.TypeJSON)
-	}
-	if value, ok := du.mutation.Tags(); ok {
-		_spec.SetField(ddns.FieldTags, field.TypeJSON, value)
-	}
-	if value, ok := du.mutation.AppendedTags(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, ddns.FieldTags, value)
-		})
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, du.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -729,18 +709,6 @@ func (duo *DDNSUpdateOne) ClearWebhook() *DDNSUpdateOne {
 	return duo
 }
 
-// SetTags sets the "tags" field.
-func (duo *DDNSUpdateOne) SetTags(s []string) *DDNSUpdateOne {
-	duo.mutation.SetTags(s)
-	return duo
-}
-
-// AppendTags appends s to the "tags" field.
-func (duo *DDNSUpdateOne) AppendTags(s []string) *DDNSUpdateOne {
-	duo.mutation.AppendTags(s)
-	return duo
-}
-
 // Mutation returns the DDNSMutation object of the builder.
 func (duo *DDNSUpdateOne) Mutation() *DDNSMutation {
 	return duo.mutation
@@ -942,14 +910,6 @@ func (duo *DDNSUpdateOne) sqlSave(ctx context.Context) (_node *DDNS, err error) 
 	}
 	if duo.mutation.WebhookCleared() {
 		_spec.ClearField(ddns.FieldWebhook, field.TypeJSON)
-	}
-	if value, ok := duo.mutation.Tags(); ok {
-		_spec.SetField(ddns.FieldTags, field.TypeJSON, value)
-	}
-	if value, ok := duo.mutation.AppendedTags(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, ddns.FieldTags, value)
-		})
 	}
 	_node = &DDNS{config: duo.config}
 	_spec.Assign = _node.assignValues
