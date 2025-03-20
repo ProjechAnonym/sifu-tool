@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func SettingDDNS(api *gin.RouterGroup, secret string, resolver map[string]map[string]string, ipAPI map[string]string, entClient *ent.Client, logger *zap.Logger) {
+func SettingDDNS(api *gin.RouterGroup, secret string, resolver map[string]map[string]string, ipAPI map[string][]string, entClient *ent.Client, logger *zap.Logger) {
 	api.Use(middleware.Jwt(secret, logger))
 	ddns := api.Group("/ddns")
 	ddns.POST("/interface", func(c *gin.Context) {
@@ -35,12 +35,12 @@ func SettingDDNS(api *gin.RouterGroup, secret string, resolver map[string]map[st
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Json解析失败"})
 			return
 		}
-		if (form.V4method == models.INTERFACE && (form.V4interface == "" || form.IPV4 == "" || form.Rev4 == "")) || (form.V6method == models.INTERFACE && (form.V6interface == "" || form.IPV6 == "" || form.Rev6 == "")) {
+		if (form.V4method == models.INTERFACE && (form.V4interface == "" || form.Rev4 == "")) || (form.V6method == models.INTERFACE && (form.V6interface == "" || form.Rev6 == "")) {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "通过接口获取IP地址时必须指定接口名称以及匹配IP的正则表达式"})
 			return
 		}
-		if (form.V4method == models.SCRIPT && (form.V4script == "" || form.IPV4 == "")) || (form.V6method == models.SCRIPT && (form.V6script == "" || form.IPV6 == "")) {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "通过脚本获取IP地址时必须指定脚本以及IP"})
+		if (form.V4method == models.SCRIPT && form.V4script == "") || (form.V6method == models.SCRIPT && form.V6script == "") {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "通过脚本获取IP地址时必须指定脚本"})
 			return
 		}
 		if form.Domains == nil || form.Config == nil {
@@ -107,5 +107,14 @@ func SettingDDNS(api *gin.RouterGroup, secret string, resolver map[string]map[st
 			ctx.JSON(http.StatusOK, gin.H{"message": "删除任务成功"})
 			return
 		}
+	})
+	ddns.POST("/script", func(ctx *gin.Context){
+		script := ctx.PostForm("script")
+		result, err := controller.TestScript(script, logger)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("测试脚本失败: [%s]", err.Error()), "result": result})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "测试脚本成功", "result": result})
 	})
 }

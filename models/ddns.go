@@ -1,8 +1,8 @@
 package models
 
 type DDNS struct {
-	V4API      string   `yaml:"v4api"`
-	V6API      string   `yaml:"v6api"`
+	V4API      []string   `yaml:"v4api"`
+	V6API      []string   `yaml:"v6api"`
 	Resolver   map[string]map[string]string `yaml:"resolver"`
 }
 type Domain struct {

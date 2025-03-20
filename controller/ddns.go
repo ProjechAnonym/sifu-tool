@@ -41,7 +41,7 @@ func GetInterfaceIPs(logger *zap.Logger) (map[string][]string, []error){
 	return interfaceIPs, errors
 }
 
-func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string]string, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
+func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string][]string, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
 	var ipv4 string
 	var ipv6 string
 	var err error
@@ -49,24 +49,38 @@ func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string]string,
 	domains := make([]models.Domain, len(form.Domains))
 	switch form.V4method {
 		case models.INTERFACE:
-			ipv4 = form.IPV4
+			ipv4, err = ddns.IPfromInterface(form.V4interface, form.Rev4, logger)
+			if err != nil {
+				logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error()))
+			}
 		case models.IPAPI:
 			ipv4api, ok := ipAPI["ipv4"]
 			if !ok {
 				logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", "未配置IPV4接口"))
 				err = fmt.Errorf("获取IPV4地址失败")
 			}else{
-				ipv4, err = ddns.IPfromAPI(ipv4api, models.Rev4, client, logger)
-				if err != nil {
-					logger.Error(fmt.Sprintf("API获取IPV4地址失败: [%s]", err.Error()))
+				tag := false
+				for _, addr := range ipv4api {
+					ipv4, err = ddns.IPfromAPI(addr, models.Rev4, client, logger)
+					if err != nil || ipv4 == "" {
+						logger.Error(fmt.Sprintf(`"%s"获取IPV4地址失败: [%s]`, addr, err.Error()))
+						continue
+					}
+					tag = true
+				}
+				if !tag {
+					err = fmt.Errorf("API获取IPV4地址失败")
 				}
 			}
 		case models.SCRIPT:
-			ipv4 = form.IPV4
+			ipv4, err = ddns.IPfromScript(form.V4script, logger)
+			if err != nil {
+				logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error()))
+			}
 	}
 	if err != nil {
 		for i, domain := range form.Domains {
-			domain.Result = fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error())
+			domain.Result = err.Error()
 			domains[i] = domain
 		}
 		form.Domains = domains
@@ -84,24 +98,38 @@ func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string]string,
 	}
 	switch form.V6method {
 		case models.INTERFACE:
-			ipv6 = form.IPV6
+			ipv6, err = ddns.IPfromInterface(form.V6interface, form.Rev6, logger)
+			if err != nil {
+				logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error()))
+			}
 		case models.IPAPI:
 			ipv6api, ok := ipAPI["ipv6"]
 			if !ok {
 				logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", "未配置IPV6接口"))
 				err = fmt.Errorf("获取IPV6地址失败")
 			}else{
-				ipv6, err = ddns.IPfromAPI(ipv6api, models.Rev6, client, logger)
-				if err != nil {
-					logger.Error(fmt.Sprintf("API获取IPV6地址失败: [%s]", err.Error()))
+				tag := false
+				for _, addr := range ipv6api {
+					ipv6, err = ddns.IPfromAPI(addr, models.Rev6, client, logger)
+					if err != nil || ipv6 == "" {
+						logger.Error(fmt.Sprintf(`"%s"获取IPV6地址失败: [%s]`, addr, err.Error()))
+						continue
+					}
+					tag = true
+				}
+				if !tag {
+					err = fmt.Errorf("API获取IPV6地址失败")
 				}
 			}
 		case models.SCRIPT:
-			ipv6 = form.IPV6
+			ipv6, err = ddns.IPfromScript(form.V6script, logger)
+			if err != nil {
+				logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error()))
+			}
 	}
 	if err != nil {
 		for i, domain := range form.Domains {
-			domain.Result = fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error())
+			domain.Result = err.Error()
 			domains[i] = domain
 		}
 		form.Domains = domains
@@ -139,9 +167,10 @@ func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string]string,
 					domains[i] = domain
 				}
 			}
-			for i, domain := range results {
+			domains = make([]models.Domain, 0)
+			for _, domain := range results {
 				if domain.Status != models.DELETE {
-					domains[i] = domain
+					domains = append(domains, domain)
 				}
 			}
 		default:
@@ -162,7 +191,7 @@ func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string]string,
 	return form, nil
 }
 
-func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[string]string, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
+func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[string][]string, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
 	var ipv4 string
 	var ipv6 string
 	var err error
@@ -175,7 +204,14 @@ func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[strin
 	domains := make([]models.Domain, len(form.Domains))
 	switch form.V4method {
 		case models.INTERFACE:
-			ipv4 = form.IPV4
+			if record.Ipv4 != ""{
+				ipv4 = record.Ipv4
+			}else{
+				ipv4, err = ddns.IPfromInterface(form.V4interface, form.Rev4, logger)
+				if err != nil {
+					logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error()))
+				}
+			}	
 		case models.IPAPI:
 			if record.Ipv4 != ""{
 				ipv4 = record.Ipv4
@@ -185,18 +221,33 @@ func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[strin
 					logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", "未配置IPV4接口"))
 					err = fmt.Errorf("获取IPV4地址失败")
 				}else{
-					ipv4, err = ddns.IPfromAPI(ipv4api, models.Rev4, client, logger)
-					if err != nil {
-						logger.Error(fmt.Sprintf("API获取IPV4地址失败: [%s]", err.Error()))
+					tag := false
+					for _, addr := range ipv4api {
+						ipv4, err = ddns.IPfromAPI(addr, models.Rev4, client, logger)
+						if err != nil || ipv4 == "" {
+							logger.Error(fmt.Sprintf(`"%s"获取IPV4地址失败: [%s]`, addr, err.Error()))
+							continue
+						}
+						tag = true
+					}
+					if !tag {
+						err = fmt.Errorf("API获取IPV4地址失败")
 					}
 				}
 			}
 		case models.SCRIPT:
-			ipv4 = form.IPV4
+			if record.Ipv4 != ""{
+				ipv4 = record.Ipv4
+			}else{
+				ipv4, err = ddns.IPfromScript(form.V4script, logger)
+				if err != nil {
+					logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error()))
+				}
+			}	
 	}
 	if err != nil {
 		for i, domain := range form.Domains {
-			domain.Result = fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error())
+			domain.Result = err.Error()
 			domains[i] = domain
 		}
 		form.Domains = domains
@@ -214,7 +265,14 @@ func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[strin
 	}
 	switch form.V6method {
 		case models.INTERFACE:
-			ipv6 = form.IPV6
+			if record.Ipv6 != ""{
+				ipv6 = record.Ipv6
+			}else{
+				ipv6, err = ddns.IPfromInterface(form.V6interface, form.Rev6, logger)
+				if err != nil {
+					logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error()))
+				}
+			}	
 		case models.IPAPI:
 			if record.Ipv6 != ""{
 				ipv6 = record.Ipv6
@@ -224,18 +282,33 @@ func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[strin
 					logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", "未配置IPV6接口"))
 					err = fmt.Errorf("获取IPV6地址失败")
 				}else{
-					ipv6, err = ddns.IPfromAPI(ipv6api, models.Rev6, client, logger)
-					if err != nil {
-						logger.Error(fmt.Sprintf("API获取IPV6地址失败: [%s]", err.Error()))
+					tag := false
+					for _, addr := range ipv6api {
+						ipv6, err = ddns.IPfromAPI(addr, models.Rev6, client, logger)
+						if err != nil || ipv6 == "" {
+							logger.Error(fmt.Sprintf(`"%s"获取IPV6地址失败: [%s]`, addr, err.Error()))
+							continue
+						}
+						tag = true
+					}
+					if !tag {
+						err = fmt.Errorf("API获取IPV6地址失败")
 					}
 				}
 			}
 		case models.SCRIPT:
-			ipv6 = form.IPV6
+			if record.Ipv6 != ""{
+				ipv6 = record.Ipv6
+			}else{
+				ipv6, err = ddns.IPfromScript(form.V6script, logger)
+				if err != nil {
+					logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error()))
+				}
+			}	
 	}
 	if err != nil {
 		for i, domain := range form.Domains {
-			domain.Result = fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error())
+			domain.Result = err.Error()
 			domains[i] = domain
 		}
 		form.Domains = domains
@@ -273,9 +346,10 @@ func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[strin
 					domains[i] = domain
 				}
 			}
-			for i, domain := range results {
+			domains = make([]models.Domain, 0)
+			for _, domain := range results {
 				if domain.Status != models.DELETE {
-					domains[i] = domain
+					domains = append(domains, domain)
 				}
 			}
 		default:
@@ -338,4 +412,13 @@ func GetJobs(entClient *ent.Client, logger *zap.Logger) ([]struct{
 		}
 	}
 	return jobs, nil
+}
+
+func TestScript(script string, logger *zap.Logger) (string, error){
+	result, err := ddns.IPfromScript(script, logger)
+	if err != nil {
+		logger.Error(fmt.Sprintf("测试脚本失败: [%s]", err.Error()))
+		return result, fmt.Errorf("测试脚本出错")
+	}
+	return result, nil
 }

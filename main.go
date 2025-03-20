@@ -57,7 +57,7 @@ func main()  {
 	server.Use(middleware.Logger(webLogger), middleware.Recovery(true, webLogger), cors.New(middleware.Cors(*domains)))
 	api := server.Group("/api")
 	route.SettingLogin(api, setting.User, webLogger)
-	route.SettingDDNS(api, setting.User.Secret, setting.DDNS.Resolver, map[string]string{"ipv4": setting.DDNS.V4API, "ipv6": setting.DDNS.V6API}, entClient, webLogger)
+	route.SettingDDNS(api, setting.User.Secret, setting.DDNS.Resolver, map[string][]string{"ipv4": setting.DDNS.V4API, "ipv6": setting.DDNS.V6API}, entClient, webLogger)
 	
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)

@@ -11,11 +11,11 @@ server:
   enterance: /
 ddns:
   v4api:
-    https://myip.ipip.net
+    - https://myip.ipip.net
     # - https://api.ipify.org?format=json
   v6api:
     # - https://api6.ipify.org?format=json
-    https://6.ipw.cn
+    - https://6.ipw.cn
   resolver:
     cloudflare:
       api: https://api.cloudflare.com/client/v4/zones
