@@ -52,14 +52,6 @@ func main()  {
 		entClient.Close()	
 		buntClient.Close()
 	}()
-	// domais := []models.Domain{
-	// 	models.Domain{Domain: "1.lzhlovelcl.top", Type: "A", TTL: 120, Value: "192.168.50.2",},
-	// 	models.Domain{Domain: "3.lzhlovelcl.top", Type: "AAAA", TTL: 120, Value: "240e:379:17f:7400:be24:11ff:fe4d:994c"},
-	// 	models.Domain{Domain: "4.lzhlovelcl.top", Type: "AAAA",TTL: 120,Value: "240e:379:17f:7400:be24:11ff:fe4d:994c"},
-	// 	models.Domain{Domain: "3.lzhlovelcl.top", Type: "A", Value: "3.3.3.3",TTL: 120},
-	// 	models.Domain{Domain: "lzhlovelcl.top", Type: "AAAA", Value: "240e:379:17f:7400:be24:11ff:fe4d:994c",TTL: 120},
-	// 	models.Domain{Domain: "*.lzhlovelcl.top", Type: "AAAA", Value: "240e:379:17f:7400:be24:11ff:fe4d:994c",TTL: 120},
-	// }
 	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
 	server.Use(middleware.Logger(webLogger), middleware.Recovery(true, webLogger), cors.New(middleware.Cors(*domains)))
@@ -69,13 +61,6 @@ func main()  {
 	
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
-	// fmt.Println(setting.DDNS.Resolver[models.CF]["api"])
-	// client := http.DefaultClient
-	// b,e:=ddns.CloudFlare(setting.DDNS.Resolver[models.CF]["api"], "_YnGvSYspTxw1zEBMptWVvBqLWRxPMVR1_M1dsqm",domais, client, webLogger)
-	// for _, i := range(b){
-	// 	fmt.Println(i)
-	// }
-	// fmt.Println(e)
 	
 	if setting.Server.Tls != nil {
 		server.RunTLS(fmt.Sprintf(":%d", setting.Server.Tls.Port), setting.Server.Tls.Cert, setting.Server.Tls.Key)
