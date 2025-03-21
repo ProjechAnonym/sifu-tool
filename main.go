@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"sifu-tool/ddns"
 	"sifu-tool/ent"
@@ -9,6 +10,7 @@ import (
 	"sifu-tool/middleware"
 	"sifu-tool/models"
 	"sifu-tool/route"
+	"sifu-tool/schedule"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -46,7 +48,9 @@ func init() {
 	}
 	initLogger.Info("加载配置文件完成")
 	ddnsSchedule := cron.New()
-	ddnsSchedule.AddFunc("@every 1m", func() {})
+	ddnsSchedule.AddFunc("@every 1m", func() {
+		client := http.DefaultClient
+		schedule.DDNSJob(entClient, client, map[string][]string{"ipv4": setting.DDNS.V4API, "ipv6": setting.DDNS.V6API}, taskLogger)})
 	ddnsSchedule.Start()
 }
 
