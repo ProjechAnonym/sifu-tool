@@ -70,108 +70,45 @@ func GetInterfaceIPs(logger *zap.Logger) (map[string][]string, []error){
 // 返回值:
 //   更新后的JobForm对象和可能的错误
 func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string][]string, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
-    var ipv4 string
-    var ipv6 string
-    var err error
     // 初始化HTTP客户端
     client := http.DefaultClient
 
     // 初始化域名数组, 用于存储处理后的域名信息
     domains := make([]models.Domain, len(form.Domains))
-
-    // 根据不同方法获取IPv4地址
-    switch form.V4method {
-
-		// 通过网络接口获取IPv4地址
-		case models.INTERFACE:
-			ipv4, err = ddns.IPfromInterface(form.V4interface, form.Rev4, logger)
-			// 如果获取IPv4地址失败, 则记录错误
-			if err != nil {
-				logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error()))
-			}
-		
-		// 通过IPv4接口API地址获取IPv4地址
-		case models.IPAPI:
-			
-			// 从配置中获取IPv4接口API地址
-			ipv4api, ok := ipAPI["ipv4"]
-			// 如果未配置IPv4接口API地址, 则记录错误
-			if !ok {
-				logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", "未配置IPV4接口"))
-			} else {
-				// 通过IPv4接口API地址获取IPv4地址, 如果错误则使用下一个接口
-				// 成功后记录获取的地址并终止循环, 并将错误置空
-				// 若所有接口都不能正确获取地址, 则记录错误
-				for _, addr := range ipv4api {
-					ipv4, err = ddns.IPfromAPI(addr, models.Rev4, client, logger)
-					if err != nil || ipv4 == "" {
-						logger.Error(fmt.Sprintf(`"%s"获取IPV4地址失败: [%s]`, addr, err.Error()))
-						continue
-					}
-					err = nil
-					break
-				}
-			}
-		// 通过脚本获取IPv4地址
-		case models.SCRIPT:
-			// 如果获取IPv4地址失败, 则记录错误
-			ipv4, err = ddns.IPfromScript(form.V4script, logger)
-			if err != nil {
-				logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error()))
-			}
+	
+	// 获取IPv4和IPv6API接口
+	ipv4api, ok := ipAPI["ipv4"]
+	if !ok {
+		logger.Error("未配置IPV4接口")
+		return form, fmt.Errorf("未配置IPV4接口")
+	}
+	ipv6api, ok := ipAPI["ipv6"]
+	if !ok {
+		logger.Error("未配置IPV6接口")
+		return form, fmt.Errorf("未配置IPV6接口")
 	}
 
-    // 根据不同方法获取IPv6地址
-    switch form.V6method {
+	// 按照不同方法获取IPv4和IPv6地址
+	ipv4, err := ddns.GetIP(form.V4method, form.V4interface, form.Rev4, models.Rev4, form.V4script, client, logger, ipv4api...)
+	if err != nil {
+		logger.Error(fmt.Sprintf("获取IP地址失败: [%s]", err.Error()))
+	}
 
-		// 通过网络接口获取IPv6地址
-		case models.INTERFACE:
-			// 如果获取IPv6地址失败, 则记录错误
-			ipv6, err = ddns.IPfromInterface(form.V6interface, form.Rev6, logger)
-			if err != nil {
-				logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error()))
-			}
-
-		// 通过IPv6接口API地址获取IPv6地址
-		case models.IPAPI:
-			// 从配置中获取IPv6接口API地址
-			ipv6api, ok := ipAPI["ipv6"]
-			// 如果未配置IPv6接口API地址, 则记录错误
-			if !ok {
-				logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", "未配置IPV6接口"))
-			} else {
-				// 通过IPv6接口API地址获取IPv6地址, 如果错误则使用下一个接口
-				// 成功后记录获取的地址并终止循环, 并将错误置空
-				// 若所有接口都不能正确获取地址, 则记录错误
-				for _, addr := range ipv6api {
-					ipv6, err = ddns.IPfromAPI(addr, models.Rev6, client, logger)
-					if err != nil || ipv6 == "" {
-						logger.Error(fmt.Sprintf(`"%s"获取IPV6地址失败: [%s]`, addr, err.Error()))
-						continue
-					}
-					err = nil
-					break
-				}
-			}
-		// 通过脚本获取IPv6地址
-		case models.SCRIPT:
-			// 如果获取IPv6地址失败, 则记录错误
-			ipv6, err = ddns.IPfromScript(form.V6script, logger)
-			if err != nil {
-				logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error()))
-			}
+	ipv6, err := ddns.GetIP(form.V6method, form.V6interface, form.Rev6, models.Rev6, form.V6script, client, logger, ipv6api...)
+    if err != nil {
+		logger.Error(fmt.Sprintf("获取IP地址失败: [%s]", err.Error()))
 	}
 
     // 设置任务域名的要更新的IP地址
     for i, domain := range form.Domains {
         if domain.Value == "" {
             switch domain.Type {
-            case models.IPV4:
-                domain.Value = ipv4
-                domains[i] = domain
-            case models.IPV6:
-                domain.Value = ipv6
-                domains[i] = domain
+				case models.IPV4:
+					domain.Value = ipv4
+					domains[i] = domain
+				case models.IPV6:
+					domain.Value = ipv6
+					domains[i] = domain
             }
         }else{
 			domains[i] = domain
@@ -199,7 +136,6 @@ func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string][]strin
 					}
 				}
 			}
-			
 		default:
 			logger.Error(fmt.Sprintf("暂不支持%s", resolver))
 			return form, fmt.Errorf("暂不支持%s", resolver)
@@ -237,10 +173,11 @@ func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string][]strin
 // - models.JobForm: 更新后的JobForm对象
 // - error: 如果操作过程中发生错误, 则返回错误
 func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[string][]string, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
-    var ipv4 string
-    var ipv6 string
-    var err error
-
+	var (
+		ipv4 string
+		ipv6 string
+		err error
+	)
     // 从数据库中获取当前任务的IPv4和IPv6地址
     record, err := entClient.DDNS.Query().Select(entddns.FieldIpv4,entddns.FieldIpv6).Where(entddns.IDEQ(id)).Only(context.Background())
     if err != nil {
@@ -251,94 +188,36 @@ func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[strin
     client := http.DefaultClient
     domains := make([]models.Domain, len(form.Domains))
 
-	// 如果数据库中该条任务已经存在IPv4地址, 则直接使用数据库中的地址, 否则根据设定方法获取IPv4地址
+	// 获取IPv4和IPv6API接口
+	ipv4api, ok := ipAPI["ipv4"]
+	if !ok {
+		logger.Error("未配置IPV4接口")
+		return form, fmt.Errorf("未配置IPV4接口")
+	}
+	ipv6api, ok := ipAPI["ipv6"]
+	if !ok {
+		logger.Error("未配置IPV6接口")
+		return form, fmt.Errorf("未配置IPV6接口")
+	}
+
+	// 获取IPv4和IPv6地址
+	// 若记录中已经存在IP地址则直接使用记录中的地址
+	// 否则按照不同方法获取IP地址
 	if record.Ipv4 != ""{
-        ipv4 = record.Ipv4
-    }else{
-		// 根据不同方法获取IPv4地址
-		switch form.V4method {
-			// 通过网络接口获取IPv4地址
-			case models.INTERFACE:
-				ipv4, err = ddns.IPfromInterface(form.V4interface, form.Rev4, logger)
-				// 如果获取IPv4地址失败, 则记录错误
-				if err != nil {
-					logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error()))
-				}
-
-			// 通过IPv4接口API地址获取IPv4地址
-			case models.IPAPI:
-
-				// 从配置中获取IPv4接口API地址
-				ipv4api, ok := ipAPI["ipv4"]
-				// 如果未配置IPv4接口API地址, 则记录错误
-				if !ok {
-					logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", "未配置IPV4接口"))
-				}else{
-					// 通过IPv4接口API地址获取IPv4地址, 如果错误则使用下一个接口
-					// 成功后记录获取的地址并终止循环, 并将错误置空
-					// 若所有接口都不能正确获取地址, 则记录错误
-					for _, addr := range ipv4api {
-						ipv4, err = ddns.IPfromAPI(addr, models.Rev4, client, logger)
-						if err != nil || ipv4 == "" {
-							logger.Error(fmt.Sprintf(`"%s"获取IPV4地址失败: [%s]`, addr, err.Error()))
-							continue
-						}
-						err = nil
-						break
-					}
-				}
-			// 通过脚本获取IPv4地址
-			case models.SCRIPT:
-				ipv4, err = ddns.IPfromScript(form.V4script, logger)
-				// 如果获取IPv4地址失败, 则记录错误
-				if err != nil {
-					logger.Error(fmt.Sprintf("获取IPV4地址失败: [%s]", err.Error()))
-				}
+		ipv4 = record.Ipv4
+	}else{
+		ipv4, err = ddns.GetIP(form.V4method, form.V4interface, form.Rev4, models.Rev4, form.V4script, client, logger, ipv4api...)
+		if err != nil {
+			logger.Error(fmt.Sprintf("获取IP地址失败: [%s]", err.Error()))
 		}
-    }
-    
-	// 如果数据库中该条任务已经存在IPv4地址, 则直接使用数据库中的地址, 否则根据设定方法获取IPv4地址
-    if record.Ipv6 != ""{
-        ipv6 = record.Ipv6
-    }else{
-		// 根据不同方法获取IPv6地址
-		switch form.V6method {
-			// 通过网络接口获取IPv6地址
-			case models.INTERFACE:
-				ipv6, err = ddns.IPfromInterface(form.V6interface, form.Rev6, logger)
-				// 如果获取IPv6地址失败, 则记录错误
-				if err != nil {
-					logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error()))
-				}
-			// 通过IPv6接口API地址获取IPv6地址
-			case models.IPAPI:
-				
-				// 从配置中获取IPv6接口API地址
-				ipv6api, ok := ipAPI["ipv6"]
-				// 如果未配置IPv6接口API地址, 则记录错误
-				if !ok {
-					logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", "未配置IPV6接口"))
-				}else{
-					// 通过IPv6接口API地址获取IPv6地址, 如果错误则使用下一个接口
-					// 成功后记录获取的地址并终止循环, 并将错误置空
-					// 若所有接口都不能正确获取地址, 则记录错误
-					for _, addr := range ipv6api {
-						ipv6, err = ddns.IPfromAPI(addr, models.Rev6, client, logger)
-						if err != nil || ipv6 == "" {
-							logger.Error(fmt.Sprintf(`"%s"获取IPV6地址失败: [%s]`, addr, err.Error()))
-							continue
-						}
-						err = nil
-						break
-					}
-				}
-			// 通过脚本获取IPv6地址
-			case models.SCRIPT:
-				ipv6, err = ddns.IPfromScript(form.V6script, logger)
-				// 如果获取IPv6地址失败, 则记录错误
-				if err != nil {
-					logger.Error(fmt.Sprintf("获取IPV6地址失败: [%s]", err.Error()))
-				}
+	}
+
+	if record.Ipv6 != ""{
+		ipv6 = record.Ipv6
+	}else{
+		ipv6, err = ddns.GetIP(form.V6method, form.V6interface, form.Rev6, models.Rev6, form.V6script, client, logger, ipv6api...)
+		if err != nil {
+			logger.Error(fmt.Sprintf("获取IP地址失败: [%s]", err.Error()))
 		}
 	}
 

@@ -13,6 +13,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/robfig/cron/v3"
 	"github.com/spf13/viper"
 	"github.com/tidwall/buntdb"
 	"go.uber.org/zap"
@@ -44,6 +45,9 @@ func init() {
 		os.Exit(1)
 	}
 	initLogger.Info("加载配置文件完成")
+	ddnsSchedule := cron.New()
+	ddnsSchedule.AddFunc("@every 1m", func() {})
+	ddnsSchedule.Start()
 }
 
 func main()  {
@@ -58,7 +62,6 @@ func main()  {
 	api := server.Group("/api")
 	route.SettingLogin(api, setting.User, webLogger)
 	route.SettingDDNS(api, setting.User.Secret, setting.DDNS.Resolver, map[string][]string{"ipv4": setting.DDNS.V4API, "ipv6": setting.DDNS.V6API}, entClient, webLogger)
-	
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
 	
