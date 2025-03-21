@@ -17,13 +17,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/robfig/cron/v3"
 	"github.com/spf13/viper"
-	"github.com/tidwall/buntdb"
 	"go.uber.org/zap"
 )
 var taskLogger *zap.Logger
 var webLogger *zap.Logger
 var entClient *ent.Client
-var buntClient *buntdb.DB
+
 var setting models.Setting
 var environment, config, address *string
 var domains *[]string
@@ -35,8 +34,7 @@ func init() {
 	webLogger = initial.GetLogger(*environment, "web")
 	entClient = initial.InitEntdb(*environment, initLogger)
 	initLogger.Info("初始化sqlite数据库客户端完成")
-	buntClient = initial.InitBuntdb(initLogger)
-	initLogger.Info("初始化buntdb内存数据库客户端完成")
+
 	viper.SetConfigFile(*config)
 	if err := viper.ReadInConfig(); err != nil {
 		initLogger.Fatal(fmt.Sprintf("读取配置文件失败: %s", err.Error()))
@@ -58,7 +56,6 @@ func main()  {
 	defer func() {
 		taskLogger.Sync()
 		entClient.Close()	
-		buntClient.Close()
 	}()
 	gin.SetMode(gin.ReleaseMode)
 	server := gin.Default()
