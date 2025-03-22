@@ -75,6 +75,7 @@ func setDDNS(ddnsJob *ent.DDNS, entClient *ent.Client, client *http.Client, ipAP
 
 	switch ddnsJob.Config[models.RESOLVER]{
 		case models.CF:
+			// 根据不同的DNS服务商断言不同的配置类型以获取所需信息
 			cloudflare, ok := resolvers[ddnsJob.Config[models.RESOLVER]]["api"].(string)
 			if !ok {
 				logger.Error(`未能读取"cloudflare"接口信息`)
