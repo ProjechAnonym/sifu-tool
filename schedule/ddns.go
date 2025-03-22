@@ -12,7 +12,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func DDNSJob(entClient *ent.Client, client *http.Client, ipAPI map[string][]string, logger *zap.Logger) {
+func DDNSJob(entClient *ent.Client, client *http.Client, ipAPI map[string][]string, resolvers map[string]map[string]any, logger *zap.Logger) {
 	ddnsJobs, err := entClient.DDNS.Query().All(context.Background())
 	if err != nil {
 		logger.Error(fmt.Sprintf("获取任务失败: [%s]", err.Error()))
@@ -28,13 +28,13 @@ func DDNSJob(entClient *ent.Client, client *http.Client, ipAPI map[string][]stri
 		jobs.Add(1)
 		go func(){
 			defer jobs.Done()
-			setDDNS(ddnsJob, entClient, client, ipAPI, logger)
+			setDDNS(ddnsJob, entClient, client, ipAPI, resolvers, logger)
 		}()
 	}
 	jobs.Wait()
 }
 
-func setDDNS(ddnsJob *ent.DDNS, entClient *ent.Client, client *http.Client, ipAPI map[string][]string, logger *zap.Logger){
+func setDDNS(ddnsJob *ent.DDNS, entClient *ent.Client, client *http.Client, ipAPI map[string][]string, resolvers map[string]map[string]any, logger *zap.Logger){
 
 	// 获取IPv4和IPv6API接口
 	ipv4api, ok := ipAPI["ipv4"]
@@ -75,7 +75,13 @@ func setDDNS(ddnsJob *ent.DDNS, entClient *ent.Client, client *http.Client, ipAP
 
 	switch ddnsJob.Config[models.RESOLVER]{
 		case models.CF:
-			results, err := ddns.CloudFlare("api", ddnsJob.Config[models.CFTOKEN], ddnsJob.Domains, client, logger)
+			cloudflare, ok := resolvers[ddnsJob.Config[models.RESOLVER]]["api"].(string)
+			if !ok {
+				logger.Error(`未能读取"cloudflare"接口信息`)
+				return
+			}
+			
+			results, err := ddns.CloudFlare(cloudflare, ddnsJob.Config[models.CFTOKEN], ddnsJob.Domains, client, logger)
 			if err != nil {
 				// 该函数返回的错误为初始化错误，若出错则整个域名列表都不会更新
 				// 因此将每条域名的结果都设置为该错误

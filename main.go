@@ -48,7 +48,7 @@ func init() {
 	ddnsSchedule := cron.New()
 	ddnsSchedule.AddFunc("@every 1m", func() {
 		client := http.DefaultClient
-		schedule.DDNSJob(entClient, client, map[string][]string{"ipv4": setting.DDNS.V4API, "ipv6": setting.DDNS.V6API}, taskLogger)})
+		schedule.DDNSJob(entClient, client, map[string][]string{"ipv4": setting.DDNS.V4API, "ipv6": setting.DDNS.V6API}, setting.DDNS.Resolver, taskLogger)})
 	ddnsSchedule.Start()
 }
 

@@ -69,7 +69,7 @@ func GetInterfaceIPs(logger *zap.Logger) (map[string][]string, []error){
 //   logger: 日志记录器
 // 返回值:
 //   更新后的JobForm对象和可能的错误
-func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string][]string, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
+func AddJobs(form models.JobForm, resolver string, ipAPI map[string][]string, config map[string]map[string]any, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
     // 初始化HTTP客户端
     client := http.DefaultClient
 
@@ -117,8 +117,14 @@ func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string][]strin
     // 根据托管商更新域名
     switch resolver {
 		case models.CF:
+			// 根据不同的DNS服务商断言不同的配置类型以获取所需信息
+			cloudflare, ok := config[resolver]["api"].(string)
+			if !ok {
+				logger.Error(`未能读取"cloudflare"接口信息`)
+				return form, fmt.Errorf(`未能读取"cloudflare"接口信息`)
+			}
 			// 更新域名
-			results, err := ddns.CloudFlare(api, form.Config[models.CFTOKEN], domains, client, logger)
+			results, err := ddns.CloudFlare(cloudflare, form.Config[models.CFTOKEN], domains, client, logger)
 			// 该函数返回的错误为初始化错误，若出错则整个域名列表都不会更新
 			// 因此将每条域名的结果都设置为该错误
 			if err != nil {
@@ -172,7 +178,7 @@ func AddJobs(form models.JobForm, resolver, api string, ipAPI map[string][]strin
 // 返回值:
 // - models.JobForm: 更新后的JobForm对象
 // - error: 如果操作过程中发生错误, 则返回错误
-func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[string][]string, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
+func EditJobs(form models.JobForm, resolver string, id int, ipAPI map[string][]string, config map[string]map[string]any, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
 	var (
 		ipv4 string
 		ipv6 string
@@ -240,8 +246,15 @@ func EditJobs(form models.JobForm, resolver, api string, id int, ipAPI map[strin
     // 根据托管商类型更新域名记录
     switch resolver {
 		case models.CF:
+			// 根据不同的DNS服务商断言不同的配置类型以获取所需信息
+			cloudflare, ok := config[resolver]["api"].(string)
+			if !ok {
+				logger.Error(`未能读取"cloudflare"接口信息`)
+				return form, fmt.Errorf(`未能读取"cloudflare"接口信息`)
+			}
+
 			// 更新域名
-			results, err := ddns.CloudFlare(api, form.Config[models.CFTOKEN], domains, client, logger)
+			results, err := ddns.CloudFlare(cloudflare, form.Config[models.CFTOKEN], domains, client, logger)
 			if err != nil {
 				// 该函数返回的错误为初始化错误，若出错则整个域名列表都不会更新
 				// 因此将每条域名的结果都设置为该错误

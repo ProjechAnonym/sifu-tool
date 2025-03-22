@@ -3,7 +3,7 @@ package models
 type DDNS struct {
 	V4API      []string   `yaml:"v4api"`
 	V6API      []string   `yaml:"v6api"`
-	Resolver   map[string]map[string]string `yaml:"resolver"`
+	Resolver   map[string]map[string]any `yaml:"resolver"`
 }
 type Domain struct {
 	Domain  string	`json:"domain"`
@@ -13,9 +13,6 @@ type Domain struct {
 	Result  string	`json:"result,omitempty"`
 	Status  int		`json:"status,omitempty"`
 	TTL		int		`json:"ttl"`
-}
-type Cloudflare struct {
-	API		string `yaml:"api"`
 }
 
 type JobForm struct{
