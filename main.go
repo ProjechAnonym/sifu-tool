@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"encoding/base64"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -103,4 +104,54 @@ func main()  {
 		server.RunTLS(fmt.Sprintf(":%d", setting.Server.Tls.Port), setting.Server.Tls.Cert, setting.Server.Tls.Key)
 	}
 	server.Run(*address)
+}
+func encrypt(plaintext []byte, key []byte) (string, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return "", err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return "", err
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		return "", err
+	}
+
+	ciphertext := gcm.Seal(nonce, nonce, plaintext, nil)
+	return base64.StdEncoding.EncodeToString(ciphertext), nil
+}
+
+// decrypt 解密数据
+func decrypt(ciphertext string, key []byte) ([]byte, error) {
+	ciphertextBytes, err := base64.StdEncoding.DecodeString(ciphertext)
+	if err != nil {
+		return nil, err
+	}
+
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
+	}
+
+	nonceSize := gcm.NonceSize()
+	if len(ciphertextBytes) < nonceSize {
+		return nil, fmt.Errorf("ciphertext too short")
+	}
+
+	nonce, ciphertextBytes := ciphertextBytes[:nonceSize], ciphertextBytes[nonceSize:]
+	plaintext, err := gcm.Open(nil, nonce, ciphertextBytes, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return plaintext, nil
 }
