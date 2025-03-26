@@ -14,24 +14,32 @@ import (
 func init() {
 	certFields := schema.Cert{}.Fields()
 	_ = certFields
-	// certDescTag is the schema descriptor for tag field.
-	certDescTag := certFields[0].Descriptor()
-	// cert.TagValidator is a validator for the "tag" field. It is called by the builders before save.
-	cert.TagValidator = func() func(string) error {
-		validators := certDescTag.Validators
+	// certDescEmail is the schema descriptor for email field.
+	certDescEmail := certFields[1].Descriptor()
+	// cert.EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	cert.EmailValidator = func() func(string) error {
+		validators := certDescEmail.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
 		}
-		return func(tag string) error {
+		return func(email string) error {
 			for _, fn := range fns {
-				if err := fn(tag); err != nil {
+				if err := fn(email); err != nil {
 					return err
 				}
 			}
 			return nil
 		}
 	}()
+	// certDescCert is the schema descriptor for cert field.
+	certDescCert := certFields[3].Descriptor()
+	// cert.CertValidator is a validator for the "cert" field. It is called by the builders before save.
+	cert.CertValidator = certDescCert.Validators[0].(func(string) error)
+	// certDescKey is the schema descriptor for key field.
+	certDescKey := certFields[4].Descriptor()
+	// cert.KeyValidator is a validator for the "key" field. It is called by the builders before save.
+	cert.KeyValidator = certDescKey.Validators[0].(func(string) error)
 	ddnsFields := schema.DDNS{}.Fields()
 	_ = ddnsFields
 	// ddnsDescIpv6 is the schema descriptor for ipv6 field.

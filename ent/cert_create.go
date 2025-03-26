@@ -19,9 +19,55 @@ type CertCreate struct {
 	hooks    []Hook
 }
 
-// SetTag sets the "tag" field.
-func (cc *CertCreate) SetTag(s string) *CertCreate {
-	cc.mutation.SetTag(s)
+// SetDomains sets the "domains" field.
+func (cc *CertCreate) SetDomains(s []string) *CertCreate {
+	cc.mutation.SetDomains(s)
+	return cc
+}
+
+// SetEmail sets the "email" field.
+func (cc *CertCreate) SetEmail(s string) *CertCreate {
+	cc.mutation.SetEmail(s)
+	return cc
+}
+
+// SetConfig sets the "config" field.
+func (cc *CertCreate) SetConfig(m map[string]string) *CertCreate {
+	cc.mutation.SetConfig(m)
+	return cc
+}
+
+// SetCert sets the "cert" field.
+func (cc *CertCreate) SetCert(s string) *CertCreate {
+	cc.mutation.SetCert(s)
+	return cc
+}
+
+// SetNillableCert sets the "cert" field if the given value is not nil.
+func (cc *CertCreate) SetNillableCert(s *string) *CertCreate {
+	if s != nil {
+		cc.SetCert(*s)
+	}
+	return cc
+}
+
+// SetKey sets the "key" field.
+func (cc *CertCreate) SetKey(s string) *CertCreate {
+	cc.mutation.SetKey(s)
+	return cc
+}
+
+// SetNillableKey sets the "key" field if the given value is not nil.
+func (cc *CertCreate) SetNillableKey(s *string) *CertCreate {
+	if s != nil {
+		cc.SetKey(*s)
+	}
+	return cc
+}
+
+// SetAuto sets the "auto" field.
+func (cc *CertCreate) SetAuto(b bool) *CertCreate {
+	cc.mutation.SetAuto(b)
 	return cc
 }
 
@@ -59,13 +105,32 @@ func (cc *CertCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *CertCreate) check() error {
-	if _, ok := cc.mutation.Tag(); !ok {
-		return &ValidationError{Name: "tag", err: errors.New(`ent: missing required field "Cert.tag"`)}
+	if _, ok := cc.mutation.Domains(); !ok {
+		return &ValidationError{Name: "domains", err: errors.New(`ent: missing required field "Cert.domains"`)}
 	}
-	if v, ok := cc.mutation.Tag(); ok {
-		if err := cert.TagValidator(v); err != nil {
-			return &ValidationError{Name: "tag", err: fmt.Errorf(`ent: validator failed for field "Cert.tag": %w`, err)}
+	if _, ok := cc.mutation.Email(); !ok {
+		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "Cert.email"`)}
+	}
+	if v, ok := cc.mutation.Email(); ok {
+		if err := cert.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Cert.email": %w`, err)}
 		}
+	}
+	if _, ok := cc.mutation.Config(); !ok {
+		return &ValidationError{Name: "config", err: errors.New(`ent: missing required field "Cert.config"`)}
+	}
+	if v, ok := cc.mutation.Cert(); ok {
+		if err := cert.CertValidator(v); err != nil {
+			return &ValidationError{Name: "cert", err: fmt.Errorf(`ent: validator failed for field "Cert.cert": %w`, err)}
+		}
+	}
+	if v, ok := cc.mutation.Key(); ok {
+		if err := cert.KeyValidator(v); err != nil {
+			return &ValidationError{Name: "key", err: fmt.Errorf(`ent: validator failed for field "Cert.key": %w`, err)}
+		}
+	}
+	if _, ok := cc.mutation.Auto(); !ok {
+		return &ValidationError{Name: "auto", err: errors.New(`ent: missing required field "Cert.auto"`)}
 	}
 	return nil
 }
@@ -93,9 +158,29 @@ func (cc *CertCreate) createSpec() (*Cert, *sqlgraph.CreateSpec) {
 		_node = &Cert{config: cc.config}
 		_spec = sqlgraph.NewCreateSpec(cert.Table, sqlgraph.NewFieldSpec(cert.FieldID, field.TypeInt))
 	)
-	if value, ok := cc.mutation.Tag(); ok {
-		_spec.SetField(cert.FieldTag, field.TypeString, value)
-		_node.Tag = value
+	if value, ok := cc.mutation.Domains(); ok {
+		_spec.SetField(cert.FieldDomains, field.TypeJSON, value)
+		_node.Domains = value
+	}
+	if value, ok := cc.mutation.Email(); ok {
+		_spec.SetField(cert.FieldEmail, field.TypeString, value)
+		_node.Email = value
+	}
+	if value, ok := cc.mutation.Config(); ok {
+		_spec.SetField(cert.FieldConfig, field.TypeJSON, value)
+		_node.Config = value
+	}
+	if value, ok := cc.mutation.Cert(); ok {
+		_spec.SetField(cert.FieldCert, field.TypeString, value)
+		_node.Cert = value
+	}
+	if value, ok := cc.mutation.Key(); ok {
+		_spec.SetField(cert.FieldKey, field.TypeString, value)
+		_node.Key = value
+	}
+	if value, ok := cc.mutation.Auto(); ok {
+		_spec.SetField(cert.FieldAuto, field.TypeBool, value)
+		_node.Auto = value
 	}
 	return _node, _spec
 }

@@ -11,8 +11,18 @@ const (
 	Label = "cert"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldTag holds the string denoting the tag field in the database.
-	FieldTag = "tag"
+	// FieldDomains holds the string denoting the domains field in the database.
+	FieldDomains = "domains"
+	// FieldEmail holds the string denoting the email field in the database.
+	FieldEmail = "email"
+	// FieldConfig holds the string denoting the config field in the database.
+	FieldConfig = "config"
+	// FieldCert holds the string denoting the cert field in the database.
+	FieldCert = "cert"
+	// FieldKey holds the string denoting the key field in the database.
+	FieldKey = "key"
+	// FieldAuto holds the string denoting the auto field in the database.
+	FieldAuto = "auto"
 	// Table holds the table name of the cert in the database.
 	Table = "certs"
 )
@@ -20,7 +30,12 @@ const (
 // Columns holds all SQL columns for cert fields.
 var Columns = []string{
 	FieldID,
-	FieldTag,
+	FieldDomains,
+	FieldEmail,
+	FieldConfig,
+	FieldCert,
+	FieldKey,
+	FieldAuto,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -34,8 +49,12 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// TagValidator is a validator for the "tag" field. It is called by the builders before save.
-	TagValidator func(string) error
+	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
+	EmailValidator func(string) error
+	// CertValidator is a validator for the "cert" field. It is called by the builders before save.
+	CertValidator func(string) error
+	// KeyValidator is a validator for the "key" field. It is called by the builders before save.
+	KeyValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Cert queries.
@@ -46,7 +65,22 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByTag orders the results by the tag field.
-func ByTag(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTag, opts...).ToFunc()
+// ByEmail orders the results by the email field.
+func ByEmail(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEmail, opts...).ToFunc()
+}
+
+// ByCert orders the results by the cert field.
+func ByCert(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCert, opts...).ToFunc()
+}
+
+// ByKey orders the results by the key field.
+func ByKey(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldKey, opts...).ToFunc()
+}
+
+// ByAuto orders the results by the auto field.
+func ByAuto(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAuto, opts...).ToFunc()
 }

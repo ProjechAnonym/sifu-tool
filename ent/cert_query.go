@@ -262,12 +262,12 @@ func (cq *CertQuery) Clone() *CertQuery {
 // Example:
 //
 //	var v []struct {
-//		Tag string `json:"tag,omitempty"`
+//		Domains []string `json:"domains,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Cert.Query().
-//		GroupBy(cert.FieldTag).
+//		GroupBy(cert.FieldDomains).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *CertQuery) GroupBy(field string, fields ...string) *CertGroupBy {
@@ -285,11 +285,11 @@ func (cq *CertQuery) GroupBy(field string, fields ...string) *CertGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Tag string `json:"tag,omitempty"`
+//		Domains []string `json:"domains,omitempty"`
 //	}
 //
 //	client.Cert.Query().
-//		Select(cert.FieldTag).
+//		Select(cert.FieldDomains).
 //		Scan(ctx, &v)
 func (cq *CertQuery) Select(fields ...string) *CertSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)

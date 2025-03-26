@@ -11,7 +11,12 @@ var (
 	// CertsColumns holds the columns for the "certs" table.
 	CertsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "tag", Type: field.TypeString, Size: 500},
+		{Name: "domains", Type: field.TypeJSON},
+		{Name: "email", Type: field.TypeString, Size: 200},
+		{Name: "config", Type: field.TypeJSON},
+		{Name: "cert", Type: field.TypeString, Nullable: true, Size: 1000},
+		{Name: "key", Type: field.TypeString, Nullable: true, Size: 1000},
+		{Name: "auto", Type: field.TypeBool},
 	}
 	// CertsTable holds the schema information for the "certs" table.
 	CertsTable = &schema.Table{

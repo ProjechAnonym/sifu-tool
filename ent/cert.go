@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"sifu-tool/ent/cert"
 	"strings"
@@ -16,8 +17,18 @@ type Cert struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Tag holds the value of the "tag" field.
-	Tag          string `json:"tag,omitempty"`
+	// Domains holds the value of the "domains" field.
+	Domains []string `json:"domains,omitempty"`
+	// Email holds the value of the "email" field.
+	Email string `json:"email,omitempty"`
+	// Config holds the value of the "config" field.
+	Config map[string]string `json:"config,omitempty"`
+	// Cert holds the value of the "cert" field.
+	Cert string `json:"cert,omitempty"`
+	// Key holds the value of the "key" field.
+	Key string `json:"key,omitempty"`
+	// Auto holds the value of the "auto" field.
+	Auto         bool `json:"auto,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -26,9 +37,13 @@ func (*Cert) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case cert.FieldDomains, cert.FieldConfig:
+			values[i] = new([]byte)
+		case cert.FieldAuto:
+			values[i] = new(sql.NullBool)
 		case cert.FieldID:
 			values[i] = new(sql.NullInt64)
-		case cert.FieldTag:
+		case cert.FieldEmail, cert.FieldCert, cert.FieldKey:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -51,11 +66,45 @@ func (c *Cert) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			c.ID = int(value.Int64)
-		case cert.FieldTag:
+		case cert.FieldDomains:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field domains", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Domains); err != nil {
+					return fmt.Errorf("unmarshal field domains: %w", err)
+				}
+			}
+		case cert.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field tag", values[i])
+				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				c.Tag = value.String
+				c.Email = value.String
+			}
+		case cert.FieldConfig:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field config", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Config); err != nil {
+					return fmt.Errorf("unmarshal field config: %w", err)
+				}
+			}
+		case cert.FieldCert:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field cert", values[i])
+			} else if value.Valid {
+				c.Cert = value.String
+			}
+		case cert.FieldKey:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field key", values[i])
+			} else if value.Valid {
+				c.Key = value.String
+			}
+		case cert.FieldAuto:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field auto", values[i])
+			} else if value.Valid {
+				c.Auto = value.Bool
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -93,8 +142,23 @@ func (c *Cert) String() string {
 	var builder strings.Builder
 	builder.WriteString("Cert(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
-	builder.WriteString("tag=")
-	builder.WriteString(c.Tag)
+	builder.WriteString("domains=")
+	builder.WriteString(fmt.Sprintf("%v", c.Domains))
+	builder.WriteString(", ")
+	builder.WriteString("email=")
+	builder.WriteString(c.Email)
+	builder.WriteString(", ")
+	builder.WriteString("config=")
+	builder.WriteString(fmt.Sprintf("%v", c.Config))
+	builder.WriteString(", ")
+	builder.WriteString("cert=")
+	builder.WriteString(c.Cert)
+	builder.WriteString(", ")
+	builder.WriteString("key=")
+	builder.WriteString(c.Key)
+	builder.WriteString(", ")
+	builder.WriteString("auto=")
+	builder.WriteString(fmt.Sprintf("%v", c.Auto))
 	builder.WriteByte(')')
 	return builder.String()
 }

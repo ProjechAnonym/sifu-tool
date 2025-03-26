@@ -35,7 +35,13 @@ type CertMutation struct {
 	op            Op
 	typ           string
 	id            *int
-	tag           *string
+	domains       *[]string
+	appenddomains []string
+	email         *string
+	_config       *map[string]string
+	cert          *string
+	key           *string
+	auto          *bool
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Cert, error)
@@ -140,40 +146,261 @@ func (m *CertMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetTag sets the "tag" field.
-func (m *CertMutation) SetTag(s string) {
-	m.tag = &s
+// SetDomains sets the "domains" field.
+func (m *CertMutation) SetDomains(s []string) {
+	m.domains = &s
+	m.appenddomains = nil
 }
 
-// Tag returns the value of the "tag" field in the mutation.
-func (m *CertMutation) Tag() (r string, exists bool) {
-	v := m.tag
+// Domains returns the value of the "domains" field in the mutation.
+func (m *CertMutation) Domains() (r []string, exists bool) {
+	v := m.domains
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTag returns the old "tag" field's value of the Cert entity.
+// OldDomains returns the old "domains" field's value of the Cert entity.
 // If the Cert object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CertMutation) OldTag(ctx context.Context) (v string, err error) {
+func (m *CertMutation) OldDomains(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTag is only allowed on UpdateOne operations")
+		return v, errors.New("OldDomains is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTag requires an ID field in the mutation")
+		return v, errors.New("OldDomains requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTag: %w", err)
+		return v, fmt.Errorf("querying old value for OldDomains: %w", err)
 	}
-	return oldValue.Tag, nil
+	return oldValue.Domains, nil
 }
 
-// ResetTag resets all changes to the "tag" field.
-func (m *CertMutation) ResetTag() {
-	m.tag = nil
+// AppendDomains adds s to the "domains" field.
+func (m *CertMutation) AppendDomains(s []string) {
+	m.appenddomains = append(m.appenddomains, s...)
+}
+
+// AppendedDomains returns the list of values that were appended to the "domains" field in this mutation.
+func (m *CertMutation) AppendedDomains() ([]string, bool) {
+	if len(m.appenddomains) == 0 {
+		return nil, false
+	}
+	return m.appenddomains, true
+}
+
+// ResetDomains resets all changes to the "domains" field.
+func (m *CertMutation) ResetDomains() {
+	m.domains = nil
+	m.appenddomains = nil
+}
+
+// SetEmail sets the "email" field.
+func (m *CertMutation) SetEmail(s string) {
+	m.email = &s
+}
+
+// Email returns the value of the "email" field in the mutation.
+func (m *CertMutation) Email() (r string, exists bool) {
+	v := m.email
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEmail returns the old "email" field's value of the Cert entity.
+// If the Cert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertMutation) OldEmail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEmail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEmail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEmail: %w", err)
+	}
+	return oldValue.Email, nil
+}
+
+// ResetEmail resets all changes to the "email" field.
+func (m *CertMutation) ResetEmail() {
+	m.email = nil
+}
+
+// SetConfig sets the "config" field.
+func (m *CertMutation) SetConfig(value map[string]string) {
+	m._config = &value
+}
+
+// Config returns the value of the "config" field in the mutation.
+func (m *CertMutation) Config() (r map[string]string, exists bool) {
+	v := m._config
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldConfig returns the old "config" field's value of the Cert entity.
+// If the Cert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertMutation) OldConfig(ctx context.Context) (v map[string]string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldConfig is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldConfig requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldConfig: %w", err)
+	}
+	return oldValue.Config, nil
+}
+
+// ResetConfig resets all changes to the "config" field.
+func (m *CertMutation) ResetConfig() {
+	m._config = nil
+}
+
+// SetCert sets the "cert" field.
+func (m *CertMutation) SetCert(s string) {
+	m.cert = &s
+}
+
+// Cert returns the value of the "cert" field in the mutation.
+func (m *CertMutation) Cert() (r string, exists bool) {
+	v := m.cert
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCert returns the old "cert" field's value of the Cert entity.
+// If the Cert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertMutation) OldCert(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCert is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCert requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCert: %w", err)
+	}
+	return oldValue.Cert, nil
+}
+
+// ClearCert clears the value of the "cert" field.
+func (m *CertMutation) ClearCert() {
+	m.cert = nil
+	m.clearedFields[cert.FieldCert] = struct{}{}
+}
+
+// CertCleared returns if the "cert" field was cleared in this mutation.
+func (m *CertMutation) CertCleared() bool {
+	_, ok := m.clearedFields[cert.FieldCert]
+	return ok
+}
+
+// ResetCert resets all changes to the "cert" field.
+func (m *CertMutation) ResetCert() {
+	m.cert = nil
+	delete(m.clearedFields, cert.FieldCert)
+}
+
+// SetKey sets the "key" field.
+func (m *CertMutation) SetKey(s string) {
+	m.key = &s
+}
+
+// Key returns the value of the "key" field in the mutation.
+func (m *CertMutation) Key() (r string, exists bool) {
+	v := m.key
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldKey returns the old "key" field's value of the Cert entity.
+// If the Cert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertMutation) OldKey(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldKey is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldKey requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldKey: %w", err)
+	}
+	return oldValue.Key, nil
+}
+
+// ClearKey clears the value of the "key" field.
+func (m *CertMutation) ClearKey() {
+	m.key = nil
+	m.clearedFields[cert.FieldKey] = struct{}{}
+}
+
+// KeyCleared returns if the "key" field was cleared in this mutation.
+func (m *CertMutation) KeyCleared() bool {
+	_, ok := m.clearedFields[cert.FieldKey]
+	return ok
+}
+
+// ResetKey resets all changes to the "key" field.
+func (m *CertMutation) ResetKey() {
+	m.key = nil
+	delete(m.clearedFields, cert.FieldKey)
+}
+
+// SetAuto sets the "auto" field.
+func (m *CertMutation) SetAuto(b bool) {
+	m.auto = &b
+}
+
+// Auto returns the value of the "auto" field in the mutation.
+func (m *CertMutation) Auto() (r bool, exists bool) {
+	v := m.auto
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAuto returns the old "auto" field's value of the Cert entity.
+// If the Cert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertMutation) OldAuto(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAuto is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAuto requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAuto: %w", err)
+	}
+	return oldValue.Auto, nil
+}
+
+// ResetAuto resets all changes to the "auto" field.
+func (m *CertMutation) ResetAuto() {
+	m.auto = nil
 }
 
 // Where appends a list predicates to the CertMutation builder.
@@ -210,9 +437,24 @@ func (m *CertMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CertMutation) Fields() []string {
-	fields := make([]string, 0, 1)
-	if m.tag != nil {
-		fields = append(fields, cert.FieldTag)
+	fields := make([]string, 0, 6)
+	if m.domains != nil {
+		fields = append(fields, cert.FieldDomains)
+	}
+	if m.email != nil {
+		fields = append(fields, cert.FieldEmail)
+	}
+	if m._config != nil {
+		fields = append(fields, cert.FieldConfig)
+	}
+	if m.cert != nil {
+		fields = append(fields, cert.FieldCert)
+	}
+	if m.key != nil {
+		fields = append(fields, cert.FieldKey)
+	}
+	if m.auto != nil {
+		fields = append(fields, cert.FieldAuto)
 	}
 	return fields
 }
@@ -222,8 +464,18 @@ func (m *CertMutation) Fields() []string {
 // schema.
 func (m *CertMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case cert.FieldTag:
-		return m.Tag()
+	case cert.FieldDomains:
+		return m.Domains()
+	case cert.FieldEmail:
+		return m.Email()
+	case cert.FieldConfig:
+		return m.Config()
+	case cert.FieldCert:
+		return m.Cert()
+	case cert.FieldKey:
+		return m.Key()
+	case cert.FieldAuto:
+		return m.Auto()
 	}
 	return nil, false
 }
@@ -233,8 +485,18 @@ func (m *CertMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *CertMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case cert.FieldTag:
-		return m.OldTag(ctx)
+	case cert.FieldDomains:
+		return m.OldDomains(ctx)
+	case cert.FieldEmail:
+		return m.OldEmail(ctx)
+	case cert.FieldConfig:
+		return m.OldConfig(ctx)
+	case cert.FieldCert:
+		return m.OldCert(ctx)
+	case cert.FieldKey:
+		return m.OldKey(ctx)
+	case cert.FieldAuto:
+		return m.OldAuto(ctx)
 	}
 	return nil, fmt.Errorf("unknown Cert field %s", name)
 }
@@ -244,12 +506,47 @@ func (m *CertMutation) OldField(ctx context.Context, name string) (ent.Value, er
 // type.
 func (m *CertMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case cert.FieldTag:
+	case cert.FieldDomains:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDomains(v)
+		return nil
+	case cert.FieldEmail:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTag(v)
+		m.SetEmail(v)
+		return nil
+	case cert.FieldConfig:
+		v, ok := value.(map[string]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetConfig(v)
+		return nil
+	case cert.FieldCert:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCert(v)
+		return nil
+	case cert.FieldKey:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetKey(v)
+		return nil
+	case cert.FieldAuto:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAuto(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Cert field %s", name)
@@ -280,7 +577,14 @@ func (m *CertMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CertMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(cert.FieldCert) {
+		fields = append(fields, cert.FieldCert)
+	}
+	if m.FieldCleared(cert.FieldKey) {
+		fields = append(fields, cert.FieldKey)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -293,6 +597,14 @@ func (m *CertMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CertMutation) ClearField(name string) error {
+	switch name {
+	case cert.FieldCert:
+		m.ClearCert()
+		return nil
+	case cert.FieldKey:
+		m.ClearKey()
+		return nil
+	}
 	return fmt.Errorf("unknown Cert nullable field %s", name)
 }
 
@@ -300,8 +612,23 @@ func (m *CertMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *CertMutation) ResetField(name string) error {
 	switch name {
-	case cert.FieldTag:
-		m.ResetTag()
+	case cert.FieldDomains:
+		m.ResetDomains()
+		return nil
+	case cert.FieldEmail:
+		m.ResetEmail()
+		return nil
+	case cert.FieldConfig:
+		m.ResetConfig()
+		return nil
+	case cert.FieldCert:
+		m.ResetCert()
+		return nil
+	case cert.FieldKey:
+		m.ResetKey()
+		return nil
+	case cert.FieldAuto:
+		m.ResetAuto()
 		return nil
 	}
 	return fmt.Errorf("unknown Cert field %s", name)

@@ -1,7 +1,15 @@
 package main
 
 import (
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/ecdsa"
+	"crypto/elliptic"
+	"crypto/rand"
+	"crypto/x509"
+	"encoding/base64"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"sifu-tool/ddns"
@@ -65,7 +73,32 @@ func main()  {
 	route.SettingDDNS(api, setting.User.Secret, setting.DDNS.Resolver, map[string][]string{"ipv4": setting.DDNS.V4API, "ipv6": setting.DDNS.V6API}, entClient, webLogger)
 	a,_ := ddns.IPfromInterface("enp6s18",`^fe.*$`, webLogger)
 	fmt.Println(a)
+	privateKey, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
+	if err != nil {
+		log.Fatal(err)
+	}	
+	b, _ := x509.MarshalECPrivateKey(privateKey)
+	block, _ := aes.NewCipher([]byte("1234567890123456"))
+	gcm, _ := cipher.NewGCM(block)
+
+	nonce := make([]byte, gcm.NonceSize())
+
+	ciphertext := gcm.Seal(nonce, nonce, b, nil)
+	k := base64.StdEncoding.EncodeToString(ciphertext)
+	ciphertext1, _ := base64.StdEncoding.DecodeString(k)
+	block1, _ := aes.NewCipher([]byte("1234567890123456"))
+
+
+	gcm1, _ := cipher.NewGCM(block1)
 	
+
+	nonceSize := gcm1.NonceSize()
+
+
+	nonce, ciphertextBytes := ciphertext1[:nonceSize], ciphertext1[nonceSize:]
+	plaintext, _ := gcm.Open(nil, nonce, ciphertextBytes, nil)
+	d,_ := x509.ParseECPrivateKey(plaintext)
+	fmt.Println(d.Equal(privateKey))
 	if setting.Server.Tls != nil {
 		server.RunTLS(fmt.Sprintf(":%d", setting.Server.Tls.Port), setting.Server.Tls.Cert, setting.Server.Tls.Key)
 	}

@@ -11,6 +11,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 )
 
@@ -27,16 +28,88 @@ func (cu *CertUpdate) Where(ps ...predicate.Cert) *CertUpdate {
 	return cu
 }
 
-// SetTag sets the "tag" field.
-func (cu *CertUpdate) SetTag(s string) *CertUpdate {
-	cu.mutation.SetTag(s)
+// SetDomains sets the "domains" field.
+func (cu *CertUpdate) SetDomains(s []string) *CertUpdate {
+	cu.mutation.SetDomains(s)
 	return cu
 }
 
-// SetNillableTag sets the "tag" field if the given value is not nil.
-func (cu *CertUpdate) SetNillableTag(s *string) *CertUpdate {
+// AppendDomains appends s to the "domains" field.
+func (cu *CertUpdate) AppendDomains(s []string) *CertUpdate {
+	cu.mutation.AppendDomains(s)
+	return cu
+}
+
+// SetEmail sets the "email" field.
+func (cu *CertUpdate) SetEmail(s string) *CertUpdate {
+	cu.mutation.SetEmail(s)
+	return cu
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (cu *CertUpdate) SetNillableEmail(s *string) *CertUpdate {
 	if s != nil {
-		cu.SetTag(*s)
+		cu.SetEmail(*s)
+	}
+	return cu
+}
+
+// SetConfig sets the "config" field.
+func (cu *CertUpdate) SetConfig(m map[string]string) *CertUpdate {
+	cu.mutation.SetConfig(m)
+	return cu
+}
+
+// SetCert sets the "cert" field.
+func (cu *CertUpdate) SetCert(s string) *CertUpdate {
+	cu.mutation.SetCert(s)
+	return cu
+}
+
+// SetNillableCert sets the "cert" field if the given value is not nil.
+func (cu *CertUpdate) SetNillableCert(s *string) *CertUpdate {
+	if s != nil {
+		cu.SetCert(*s)
+	}
+	return cu
+}
+
+// ClearCert clears the value of the "cert" field.
+func (cu *CertUpdate) ClearCert() *CertUpdate {
+	cu.mutation.ClearCert()
+	return cu
+}
+
+// SetKey sets the "key" field.
+func (cu *CertUpdate) SetKey(s string) *CertUpdate {
+	cu.mutation.SetKey(s)
+	return cu
+}
+
+// SetNillableKey sets the "key" field if the given value is not nil.
+func (cu *CertUpdate) SetNillableKey(s *string) *CertUpdate {
+	if s != nil {
+		cu.SetKey(*s)
+	}
+	return cu
+}
+
+// ClearKey clears the value of the "key" field.
+func (cu *CertUpdate) ClearKey() *CertUpdate {
+	cu.mutation.ClearKey()
+	return cu
+}
+
+// SetAuto sets the "auto" field.
+func (cu *CertUpdate) SetAuto(b bool) *CertUpdate {
+	cu.mutation.SetAuto(b)
+	return cu
+}
+
+// SetNillableAuto sets the "auto" field if the given value is not nil.
+func (cu *CertUpdate) SetNillableAuto(b *bool) *CertUpdate {
+	if b != nil {
+		cu.SetAuto(*b)
 	}
 	return cu
 }
@@ -75,9 +148,19 @@ func (cu *CertUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *CertUpdate) check() error {
-	if v, ok := cu.mutation.Tag(); ok {
-		if err := cert.TagValidator(v); err != nil {
-			return &ValidationError{Name: "tag", err: fmt.Errorf(`ent: validator failed for field "Cert.tag": %w`, err)}
+	if v, ok := cu.mutation.Email(); ok {
+		if err := cert.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Cert.email": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.Cert(); ok {
+		if err := cert.CertValidator(v); err != nil {
+			return &ValidationError{Name: "cert", err: fmt.Errorf(`ent: validator failed for field "Cert.cert": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.Key(); ok {
+		if err := cert.KeyValidator(v); err != nil {
+			return &ValidationError{Name: "key", err: fmt.Errorf(`ent: validator failed for field "Cert.key": %w`, err)}
 		}
 	}
 	return nil
@@ -95,8 +178,34 @@ func (cu *CertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := cu.mutation.Tag(); ok {
-		_spec.SetField(cert.FieldTag, field.TypeString, value)
+	if value, ok := cu.mutation.Domains(); ok {
+		_spec.SetField(cert.FieldDomains, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedDomains(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, cert.FieldDomains, value)
+		})
+	}
+	if value, ok := cu.mutation.Email(); ok {
+		_spec.SetField(cert.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.Config(); ok {
+		_spec.SetField(cert.FieldConfig, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.Cert(); ok {
+		_spec.SetField(cert.FieldCert, field.TypeString, value)
+	}
+	if cu.mutation.CertCleared() {
+		_spec.ClearField(cert.FieldCert, field.TypeString)
+	}
+	if value, ok := cu.mutation.Key(); ok {
+		_spec.SetField(cert.FieldKey, field.TypeString, value)
+	}
+	if cu.mutation.KeyCleared() {
+		_spec.ClearField(cert.FieldKey, field.TypeString)
+	}
+	if value, ok := cu.mutation.Auto(); ok {
+		_spec.SetField(cert.FieldAuto, field.TypeBool, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -118,16 +227,88 @@ type CertUpdateOne struct {
 	mutation *CertMutation
 }
 
-// SetTag sets the "tag" field.
-func (cuo *CertUpdateOne) SetTag(s string) *CertUpdateOne {
-	cuo.mutation.SetTag(s)
+// SetDomains sets the "domains" field.
+func (cuo *CertUpdateOne) SetDomains(s []string) *CertUpdateOne {
+	cuo.mutation.SetDomains(s)
 	return cuo
 }
 
-// SetNillableTag sets the "tag" field if the given value is not nil.
-func (cuo *CertUpdateOne) SetNillableTag(s *string) *CertUpdateOne {
+// AppendDomains appends s to the "domains" field.
+func (cuo *CertUpdateOne) AppendDomains(s []string) *CertUpdateOne {
+	cuo.mutation.AppendDomains(s)
+	return cuo
+}
+
+// SetEmail sets the "email" field.
+func (cuo *CertUpdateOne) SetEmail(s string) *CertUpdateOne {
+	cuo.mutation.SetEmail(s)
+	return cuo
+}
+
+// SetNillableEmail sets the "email" field if the given value is not nil.
+func (cuo *CertUpdateOne) SetNillableEmail(s *string) *CertUpdateOne {
 	if s != nil {
-		cuo.SetTag(*s)
+		cuo.SetEmail(*s)
+	}
+	return cuo
+}
+
+// SetConfig sets the "config" field.
+func (cuo *CertUpdateOne) SetConfig(m map[string]string) *CertUpdateOne {
+	cuo.mutation.SetConfig(m)
+	return cuo
+}
+
+// SetCert sets the "cert" field.
+func (cuo *CertUpdateOne) SetCert(s string) *CertUpdateOne {
+	cuo.mutation.SetCert(s)
+	return cuo
+}
+
+// SetNillableCert sets the "cert" field if the given value is not nil.
+func (cuo *CertUpdateOne) SetNillableCert(s *string) *CertUpdateOne {
+	if s != nil {
+		cuo.SetCert(*s)
+	}
+	return cuo
+}
+
+// ClearCert clears the value of the "cert" field.
+func (cuo *CertUpdateOne) ClearCert() *CertUpdateOne {
+	cuo.mutation.ClearCert()
+	return cuo
+}
+
+// SetKey sets the "key" field.
+func (cuo *CertUpdateOne) SetKey(s string) *CertUpdateOne {
+	cuo.mutation.SetKey(s)
+	return cuo
+}
+
+// SetNillableKey sets the "key" field if the given value is not nil.
+func (cuo *CertUpdateOne) SetNillableKey(s *string) *CertUpdateOne {
+	if s != nil {
+		cuo.SetKey(*s)
+	}
+	return cuo
+}
+
+// ClearKey clears the value of the "key" field.
+func (cuo *CertUpdateOne) ClearKey() *CertUpdateOne {
+	cuo.mutation.ClearKey()
+	return cuo
+}
+
+// SetAuto sets the "auto" field.
+func (cuo *CertUpdateOne) SetAuto(b bool) *CertUpdateOne {
+	cuo.mutation.SetAuto(b)
+	return cuo
+}
+
+// SetNillableAuto sets the "auto" field if the given value is not nil.
+func (cuo *CertUpdateOne) SetNillableAuto(b *bool) *CertUpdateOne {
+	if b != nil {
+		cuo.SetAuto(*b)
 	}
 	return cuo
 }
@@ -179,9 +360,19 @@ func (cuo *CertUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *CertUpdateOne) check() error {
-	if v, ok := cuo.mutation.Tag(); ok {
-		if err := cert.TagValidator(v); err != nil {
-			return &ValidationError{Name: "tag", err: fmt.Errorf(`ent: validator failed for field "Cert.tag": %w`, err)}
+	if v, ok := cuo.mutation.Email(); ok {
+		if err := cert.EmailValidator(v); err != nil {
+			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Cert.email": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.Cert(); ok {
+		if err := cert.CertValidator(v); err != nil {
+			return &ValidationError{Name: "cert", err: fmt.Errorf(`ent: validator failed for field "Cert.cert": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.Key(); ok {
+		if err := cert.KeyValidator(v); err != nil {
+			return &ValidationError{Name: "key", err: fmt.Errorf(`ent: validator failed for field "Cert.key": %w`, err)}
 		}
 	}
 	return nil
@@ -216,8 +407,34 @@ func (cuo *CertUpdateOne) sqlSave(ctx context.Context) (_node *Cert, err error) 
 			}
 		}
 	}
-	if value, ok := cuo.mutation.Tag(); ok {
-		_spec.SetField(cert.FieldTag, field.TypeString, value)
+	if value, ok := cuo.mutation.Domains(); ok {
+		_spec.SetField(cert.FieldDomains, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedDomains(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, cert.FieldDomains, value)
+		})
+	}
+	if value, ok := cuo.mutation.Email(); ok {
+		_spec.SetField(cert.FieldEmail, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.Config(); ok {
+		_spec.SetField(cert.FieldConfig, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.Cert(); ok {
+		_spec.SetField(cert.FieldCert, field.TypeString, value)
+	}
+	if cuo.mutation.CertCleared() {
+		_spec.ClearField(cert.FieldCert, field.TypeString)
+	}
+	if value, ok := cuo.mutation.Key(); ok {
+		_spec.SetField(cert.FieldKey, field.TypeString, value)
+	}
+	if cuo.mutation.KeyCleared() {
+		_spec.ClearField(cert.FieldKey, field.TypeString)
+	}
+	if value, ok := cuo.mutation.Auto(); ok {
+		_spec.SetField(cert.FieldAuto, field.TypeBool, value)
 	}
 	_node = &Cert{config: cuo.config}
 	_spec.Assign = _node.assignValues

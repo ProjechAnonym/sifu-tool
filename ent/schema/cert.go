@@ -12,7 +12,11 @@ type Cert struct {
 
 // Fields of the Cert.
 func (Cert) Fields() []ent.Field {
-	return []ent.Field{field.String("tag").NotEmpty().MaxLen(500)}
+	return []ent.Field{
+		field.Strings("domains"),field.String("email").NotEmpty().MaxLen(200),
+		field.JSON("config", map[string]string{}),field.String("cert").Optional().MaxLen(1000),
+		field.String("key").Optional().MaxLen(1000),field.Bool("auto"),
+	}
 }
 
 // Edges of the Cert.
