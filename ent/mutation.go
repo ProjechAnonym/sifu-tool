@@ -39,9 +39,10 @@ type CertMutation struct {
 	appenddomains []string
 	email         *string
 	_config       *map[string]string
-	cert          *string
-	key           *string
+	certPath      *string
+	keyPath       *string
 	auto          *bool
+	result        *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Cert, error)
@@ -269,102 +270,102 @@ func (m *CertMutation) ResetConfig() {
 	m._config = nil
 }
 
-// SetCert sets the "cert" field.
-func (m *CertMutation) SetCert(s string) {
-	m.cert = &s
+// SetCertPath sets the "certPath" field.
+func (m *CertMutation) SetCertPath(s string) {
+	m.certPath = &s
 }
 
-// Cert returns the value of the "cert" field in the mutation.
-func (m *CertMutation) Cert() (r string, exists bool) {
-	v := m.cert
+// CertPath returns the value of the "certPath" field in the mutation.
+func (m *CertMutation) CertPath() (r string, exists bool) {
+	v := m.certPath
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCert returns the old "cert" field's value of the Cert entity.
+// OldCertPath returns the old "certPath" field's value of the Cert entity.
 // If the Cert object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CertMutation) OldCert(ctx context.Context) (v string, err error) {
+func (m *CertMutation) OldCertPath(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCert is only allowed on UpdateOne operations")
+		return v, errors.New("OldCertPath is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCert requires an ID field in the mutation")
+		return v, errors.New("OldCertPath requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCert: %w", err)
+		return v, fmt.Errorf("querying old value for OldCertPath: %w", err)
 	}
-	return oldValue.Cert, nil
+	return oldValue.CertPath, nil
 }
 
-// ClearCert clears the value of the "cert" field.
-func (m *CertMutation) ClearCert() {
-	m.cert = nil
-	m.clearedFields[cert.FieldCert] = struct{}{}
+// ClearCertPath clears the value of the "certPath" field.
+func (m *CertMutation) ClearCertPath() {
+	m.certPath = nil
+	m.clearedFields[cert.FieldCertPath] = struct{}{}
 }
 
-// CertCleared returns if the "cert" field was cleared in this mutation.
-func (m *CertMutation) CertCleared() bool {
-	_, ok := m.clearedFields[cert.FieldCert]
+// CertPathCleared returns if the "certPath" field was cleared in this mutation.
+func (m *CertMutation) CertPathCleared() bool {
+	_, ok := m.clearedFields[cert.FieldCertPath]
 	return ok
 }
 
-// ResetCert resets all changes to the "cert" field.
-func (m *CertMutation) ResetCert() {
-	m.cert = nil
-	delete(m.clearedFields, cert.FieldCert)
+// ResetCertPath resets all changes to the "certPath" field.
+func (m *CertMutation) ResetCertPath() {
+	m.certPath = nil
+	delete(m.clearedFields, cert.FieldCertPath)
 }
 
-// SetKey sets the "key" field.
-func (m *CertMutation) SetKey(s string) {
-	m.key = &s
+// SetKeyPath sets the "keyPath" field.
+func (m *CertMutation) SetKeyPath(s string) {
+	m.keyPath = &s
 }
 
-// Key returns the value of the "key" field in the mutation.
-func (m *CertMutation) Key() (r string, exists bool) {
-	v := m.key
+// KeyPath returns the value of the "keyPath" field in the mutation.
+func (m *CertMutation) KeyPath() (r string, exists bool) {
+	v := m.keyPath
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldKey returns the old "key" field's value of the Cert entity.
+// OldKeyPath returns the old "keyPath" field's value of the Cert entity.
 // If the Cert object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CertMutation) OldKey(ctx context.Context) (v string, err error) {
+func (m *CertMutation) OldKeyPath(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldKey is only allowed on UpdateOne operations")
+		return v, errors.New("OldKeyPath is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldKey requires an ID field in the mutation")
+		return v, errors.New("OldKeyPath requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldKey: %w", err)
+		return v, fmt.Errorf("querying old value for OldKeyPath: %w", err)
 	}
-	return oldValue.Key, nil
+	return oldValue.KeyPath, nil
 }
 
-// ClearKey clears the value of the "key" field.
-func (m *CertMutation) ClearKey() {
-	m.key = nil
-	m.clearedFields[cert.FieldKey] = struct{}{}
+// ClearKeyPath clears the value of the "keyPath" field.
+func (m *CertMutation) ClearKeyPath() {
+	m.keyPath = nil
+	m.clearedFields[cert.FieldKeyPath] = struct{}{}
 }
 
-// KeyCleared returns if the "key" field was cleared in this mutation.
-func (m *CertMutation) KeyCleared() bool {
-	_, ok := m.clearedFields[cert.FieldKey]
+// KeyPathCleared returns if the "keyPath" field was cleared in this mutation.
+func (m *CertMutation) KeyPathCleared() bool {
+	_, ok := m.clearedFields[cert.FieldKeyPath]
 	return ok
 }
 
-// ResetKey resets all changes to the "key" field.
-func (m *CertMutation) ResetKey() {
-	m.key = nil
-	delete(m.clearedFields, cert.FieldKey)
+// ResetKeyPath resets all changes to the "keyPath" field.
+func (m *CertMutation) ResetKeyPath() {
+	m.keyPath = nil
+	delete(m.clearedFields, cert.FieldKeyPath)
 }
 
 // SetAuto sets the "auto" field.
@@ -403,6 +404,55 @@ func (m *CertMutation) ResetAuto() {
 	m.auto = nil
 }
 
+// SetResult sets the "result" field.
+func (m *CertMutation) SetResult(s string) {
+	m.result = &s
+}
+
+// Result returns the value of the "result" field in the mutation.
+func (m *CertMutation) Result() (r string, exists bool) {
+	v := m.result
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldResult returns the old "result" field's value of the Cert entity.
+// If the Cert object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CertMutation) OldResult(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldResult is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldResult requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldResult: %w", err)
+	}
+	return oldValue.Result, nil
+}
+
+// ClearResult clears the value of the "result" field.
+func (m *CertMutation) ClearResult() {
+	m.result = nil
+	m.clearedFields[cert.FieldResult] = struct{}{}
+}
+
+// ResultCleared returns if the "result" field was cleared in this mutation.
+func (m *CertMutation) ResultCleared() bool {
+	_, ok := m.clearedFields[cert.FieldResult]
+	return ok
+}
+
+// ResetResult resets all changes to the "result" field.
+func (m *CertMutation) ResetResult() {
+	m.result = nil
+	delete(m.clearedFields, cert.FieldResult)
+}
+
 // Where appends a list predicates to the CertMutation builder.
 func (m *CertMutation) Where(ps ...predicate.Cert) {
 	m.predicates = append(m.predicates, ps...)
@@ -437,7 +487,7 @@ func (m *CertMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CertMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.domains != nil {
 		fields = append(fields, cert.FieldDomains)
 	}
@@ -447,14 +497,17 @@ func (m *CertMutation) Fields() []string {
 	if m._config != nil {
 		fields = append(fields, cert.FieldConfig)
 	}
-	if m.cert != nil {
-		fields = append(fields, cert.FieldCert)
+	if m.certPath != nil {
+		fields = append(fields, cert.FieldCertPath)
 	}
-	if m.key != nil {
-		fields = append(fields, cert.FieldKey)
+	if m.keyPath != nil {
+		fields = append(fields, cert.FieldKeyPath)
 	}
 	if m.auto != nil {
 		fields = append(fields, cert.FieldAuto)
+	}
+	if m.result != nil {
+		fields = append(fields, cert.FieldResult)
 	}
 	return fields
 }
@@ -470,12 +523,14 @@ func (m *CertMutation) Field(name string) (ent.Value, bool) {
 		return m.Email()
 	case cert.FieldConfig:
 		return m.Config()
-	case cert.FieldCert:
-		return m.Cert()
-	case cert.FieldKey:
-		return m.Key()
+	case cert.FieldCertPath:
+		return m.CertPath()
+	case cert.FieldKeyPath:
+		return m.KeyPath()
 	case cert.FieldAuto:
 		return m.Auto()
+	case cert.FieldResult:
+		return m.Result()
 	}
 	return nil, false
 }
@@ -491,12 +546,14 @@ func (m *CertMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldEmail(ctx)
 	case cert.FieldConfig:
 		return m.OldConfig(ctx)
-	case cert.FieldCert:
-		return m.OldCert(ctx)
-	case cert.FieldKey:
-		return m.OldKey(ctx)
+	case cert.FieldCertPath:
+		return m.OldCertPath(ctx)
+	case cert.FieldKeyPath:
+		return m.OldKeyPath(ctx)
 	case cert.FieldAuto:
 		return m.OldAuto(ctx)
+	case cert.FieldResult:
+		return m.OldResult(ctx)
 	}
 	return nil, fmt.Errorf("unknown Cert field %s", name)
 }
@@ -527,19 +584,19 @@ func (m *CertMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetConfig(v)
 		return nil
-	case cert.FieldCert:
+	case cert.FieldCertPath:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetCert(v)
+		m.SetCertPath(v)
 		return nil
-	case cert.FieldKey:
+	case cert.FieldKeyPath:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetKey(v)
+		m.SetKeyPath(v)
 		return nil
 	case cert.FieldAuto:
 		v, ok := value.(bool)
@@ -547,6 +604,13 @@ func (m *CertMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAuto(v)
+		return nil
+	case cert.FieldResult:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetResult(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Cert field %s", name)
@@ -578,11 +642,14 @@ func (m *CertMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *CertMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(cert.FieldCert) {
-		fields = append(fields, cert.FieldCert)
+	if m.FieldCleared(cert.FieldCertPath) {
+		fields = append(fields, cert.FieldCertPath)
 	}
-	if m.FieldCleared(cert.FieldKey) {
-		fields = append(fields, cert.FieldKey)
+	if m.FieldCleared(cert.FieldKeyPath) {
+		fields = append(fields, cert.FieldKeyPath)
+	}
+	if m.FieldCleared(cert.FieldResult) {
+		fields = append(fields, cert.FieldResult)
 	}
 	return fields
 }
@@ -598,11 +665,14 @@ func (m *CertMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *CertMutation) ClearField(name string) error {
 	switch name {
-	case cert.FieldCert:
-		m.ClearCert()
+	case cert.FieldCertPath:
+		m.ClearCertPath()
 		return nil
-	case cert.FieldKey:
-		m.ClearKey()
+	case cert.FieldKeyPath:
+		m.ClearKeyPath()
+		return nil
+	case cert.FieldResult:
+		m.ClearResult()
 		return nil
 	}
 	return fmt.Errorf("unknown Cert nullable field %s", name)
@@ -621,14 +691,17 @@ func (m *CertMutation) ResetField(name string) error {
 	case cert.FieldConfig:
 		m.ResetConfig()
 		return nil
-	case cert.FieldCert:
-		m.ResetCert()
+	case cert.FieldCertPath:
+		m.ResetCertPath()
 		return nil
-	case cert.FieldKey:
-		m.ResetKey()
+	case cert.FieldKeyPath:
+		m.ResetKeyPath()
 		return nil
 	case cert.FieldAuto:
 		m.ResetAuto()
+		return nil
+	case cert.FieldResult:
+		m.ResetResult()
 		return nil
 	}
 	return fmt.Errorf("unknown Cert field %s", name)

@@ -23,12 +23,14 @@ type Cert struct {
 	Email string `json:"email,omitempty"`
 	// Config holds the value of the "config" field.
 	Config map[string]string `json:"config,omitempty"`
-	// Cert holds the value of the "cert" field.
-	Cert string `json:"cert,omitempty"`
-	// Key holds the value of the "key" field.
-	Key string `json:"key,omitempty"`
+	// CertPath holds the value of the "certPath" field.
+	CertPath string `json:"certPath,omitempty"`
+	// KeyPath holds the value of the "keyPath" field.
+	KeyPath string `json:"keyPath,omitempty"`
 	// Auto holds the value of the "auto" field.
-	Auto         bool `json:"auto,omitempty"`
+	Auto bool `json:"auto,omitempty"`
+	// Result holds the value of the "result" field.
+	Result       string `json:"result,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -43,7 +45,7 @@ func (*Cert) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case cert.FieldID:
 			values[i] = new(sql.NullInt64)
-		case cert.FieldEmail, cert.FieldCert, cert.FieldKey:
+		case cert.FieldEmail, cert.FieldCertPath, cert.FieldKeyPath, cert.FieldResult:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -88,23 +90,29 @@ func (c *Cert) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field config: %w", err)
 				}
 			}
-		case cert.FieldCert:
+		case cert.FieldCertPath:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field cert", values[i])
+				return fmt.Errorf("unexpected type %T for field certPath", values[i])
 			} else if value.Valid {
-				c.Cert = value.String
+				c.CertPath = value.String
 			}
-		case cert.FieldKey:
+		case cert.FieldKeyPath:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field key", values[i])
+				return fmt.Errorf("unexpected type %T for field keyPath", values[i])
 			} else if value.Valid {
-				c.Key = value.String
+				c.KeyPath = value.String
 			}
 		case cert.FieldAuto:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field auto", values[i])
 			} else if value.Valid {
 				c.Auto = value.Bool
+			}
+		case cert.FieldResult:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field result", values[i])
+			} else if value.Valid {
+				c.Result = value.String
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -151,14 +159,17 @@ func (c *Cert) String() string {
 	builder.WriteString("config=")
 	builder.WriteString(fmt.Sprintf("%v", c.Config))
 	builder.WriteString(", ")
-	builder.WriteString("cert=")
-	builder.WriteString(c.Cert)
+	builder.WriteString("certPath=")
+	builder.WriteString(c.CertPath)
 	builder.WriteString(", ")
-	builder.WriteString("key=")
-	builder.WriteString(c.Key)
+	builder.WriteString("keyPath=")
+	builder.WriteString(c.KeyPath)
 	builder.WriteString(", ")
 	builder.WriteString("auto=")
 	builder.WriteString(fmt.Sprintf("%v", c.Auto))
+	builder.WriteString(", ")
+	builder.WriteString("result=")
+	builder.WriteString(c.Result)
 	builder.WriteByte(')')
 	return builder.String()
 }

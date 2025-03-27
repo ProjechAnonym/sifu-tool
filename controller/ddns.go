@@ -69,7 +69,7 @@ func GetInterfaceIPs(logger *zap.Logger) (map[string][]string, []error){
 //   logger: 日志记录器
 // 返回值:
 //   更新后的JobForm对象和可能的错误
-func AddJobs(form models.JobForm, resolver string, ipAPI map[string][]string, config map[string]map[string]any, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
+func AddJob(form models.JobForm, resolver string, ipAPI map[string][]string, config map[string]map[string]any, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
     // 初始化HTTP客户端
     client := http.DefaultClient
 
@@ -178,7 +178,7 @@ func AddJobs(form models.JobForm, resolver string, ipAPI map[string][]string, co
 // 返回值:
 // - models.JobForm: 更新后的JobForm对象
 // - error: 如果操作过程中发生错误, 则返回错误
-func EditJobs(form models.JobForm, resolver string, id int, ipAPI map[string][]string, config map[string]map[string]any, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
+func EditJob(form models.JobForm, resolver string, id int, ipAPI map[string][]string, config map[string]map[string]any, entClient *ent.Client, logger *zap.Logger) (models.JobForm, error) {
 	var (
 		ipv4 string
 		ipv6 string

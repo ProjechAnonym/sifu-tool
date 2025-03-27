@@ -60,43 +60,43 @@ func (cu *CertUpdate) SetConfig(m map[string]string) *CertUpdate {
 	return cu
 }
 
-// SetCert sets the "cert" field.
-func (cu *CertUpdate) SetCert(s string) *CertUpdate {
-	cu.mutation.SetCert(s)
+// SetCertPath sets the "certPath" field.
+func (cu *CertUpdate) SetCertPath(s string) *CertUpdate {
+	cu.mutation.SetCertPath(s)
 	return cu
 }
 
-// SetNillableCert sets the "cert" field if the given value is not nil.
-func (cu *CertUpdate) SetNillableCert(s *string) *CertUpdate {
+// SetNillableCertPath sets the "certPath" field if the given value is not nil.
+func (cu *CertUpdate) SetNillableCertPath(s *string) *CertUpdate {
 	if s != nil {
-		cu.SetCert(*s)
+		cu.SetCertPath(*s)
 	}
 	return cu
 }
 
-// ClearCert clears the value of the "cert" field.
-func (cu *CertUpdate) ClearCert() *CertUpdate {
-	cu.mutation.ClearCert()
+// ClearCertPath clears the value of the "certPath" field.
+func (cu *CertUpdate) ClearCertPath() *CertUpdate {
+	cu.mutation.ClearCertPath()
 	return cu
 }
 
-// SetKey sets the "key" field.
-func (cu *CertUpdate) SetKey(s string) *CertUpdate {
-	cu.mutation.SetKey(s)
+// SetKeyPath sets the "keyPath" field.
+func (cu *CertUpdate) SetKeyPath(s string) *CertUpdate {
+	cu.mutation.SetKeyPath(s)
 	return cu
 }
 
-// SetNillableKey sets the "key" field if the given value is not nil.
-func (cu *CertUpdate) SetNillableKey(s *string) *CertUpdate {
+// SetNillableKeyPath sets the "keyPath" field if the given value is not nil.
+func (cu *CertUpdate) SetNillableKeyPath(s *string) *CertUpdate {
 	if s != nil {
-		cu.SetKey(*s)
+		cu.SetKeyPath(*s)
 	}
 	return cu
 }
 
-// ClearKey clears the value of the "key" field.
-func (cu *CertUpdate) ClearKey() *CertUpdate {
-	cu.mutation.ClearKey()
+// ClearKeyPath clears the value of the "keyPath" field.
+func (cu *CertUpdate) ClearKeyPath() *CertUpdate {
+	cu.mutation.ClearKeyPath()
 	return cu
 }
 
@@ -111,6 +111,26 @@ func (cu *CertUpdate) SetNillableAuto(b *bool) *CertUpdate {
 	if b != nil {
 		cu.SetAuto(*b)
 	}
+	return cu
+}
+
+// SetResult sets the "result" field.
+func (cu *CertUpdate) SetResult(s string) *CertUpdate {
+	cu.mutation.SetResult(s)
+	return cu
+}
+
+// SetNillableResult sets the "result" field if the given value is not nil.
+func (cu *CertUpdate) SetNillableResult(s *string) *CertUpdate {
+	if s != nil {
+		cu.SetResult(*s)
+	}
+	return cu
+}
+
+// ClearResult clears the value of the "result" field.
+func (cu *CertUpdate) ClearResult() *CertUpdate {
+	cu.mutation.ClearResult()
 	return cu
 }
 
@@ -153,14 +173,14 @@ func (cu *CertUpdate) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Cert.email": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.Cert(); ok {
-		if err := cert.CertValidator(v); err != nil {
-			return &ValidationError{Name: "cert", err: fmt.Errorf(`ent: validator failed for field "Cert.cert": %w`, err)}
+	if v, ok := cu.mutation.CertPath(); ok {
+		if err := cert.CertPathValidator(v); err != nil {
+			return &ValidationError{Name: "certPath", err: fmt.Errorf(`ent: validator failed for field "Cert.certPath": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.Key(); ok {
-		if err := cert.KeyValidator(v); err != nil {
-			return &ValidationError{Name: "key", err: fmt.Errorf(`ent: validator failed for field "Cert.key": %w`, err)}
+	if v, ok := cu.mutation.KeyPath(); ok {
+		if err := cert.KeyPathValidator(v); err != nil {
+			return &ValidationError{Name: "keyPath", err: fmt.Errorf(`ent: validator failed for field "Cert.keyPath": %w`, err)}
 		}
 	}
 	return nil
@@ -192,20 +212,26 @@ func (cu *CertUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Config(); ok {
 		_spec.SetField(cert.FieldConfig, field.TypeJSON, value)
 	}
-	if value, ok := cu.mutation.Cert(); ok {
-		_spec.SetField(cert.FieldCert, field.TypeString, value)
+	if value, ok := cu.mutation.CertPath(); ok {
+		_spec.SetField(cert.FieldCertPath, field.TypeString, value)
 	}
-	if cu.mutation.CertCleared() {
-		_spec.ClearField(cert.FieldCert, field.TypeString)
+	if cu.mutation.CertPathCleared() {
+		_spec.ClearField(cert.FieldCertPath, field.TypeString)
 	}
-	if value, ok := cu.mutation.Key(); ok {
-		_spec.SetField(cert.FieldKey, field.TypeString, value)
+	if value, ok := cu.mutation.KeyPath(); ok {
+		_spec.SetField(cert.FieldKeyPath, field.TypeString, value)
 	}
-	if cu.mutation.KeyCleared() {
-		_spec.ClearField(cert.FieldKey, field.TypeString)
+	if cu.mutation.KeyPathCleared() {
+		_spec.ClearField(cert.FieldKeyPath, field.TypeString)
 	}
 	if value, ok := cu.mutation.Auto(); ok {
 		_spec.SetField(cert.FieldAuto, field.TypeBool, value)
+	}
+	if value, ok := cu.mutation.Result(); ok {
+		_spec.SetField(cert.FieldResult, field.TypeString, value)
+	}
+	if cu.mutation.ResultCleared() {
+		_spec.ClearField(cert.FieldResult, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -259,43 +285,43 @@ func (cuo *CertUpdateOne) SetConfig(m map[string]string) *CertUpdateOne {
 	return cuo
 }
 
-// SetCert sets the "cert" field.
-func (cuo *CertUpdateOne) SetCert(s string) *CertUpdateOne {
-	cuo.mutation.SetCert(s)
+// SetCertPath sets the "certPath" field.
+func (cuo *CertUpdateOne) SetCertPath(s string) *CertUpdateOne {
+	cuo.mutation.SetCertPath(s)
 	return cuo
 }
 
-// SetNillableCert sets the "cert" field if the given value is not nil.
-func (cuo *CertUpdateOne) SetNillableCert(s *string) *CertUpdateOne {
+// SetNillableCertPath sets the "certPath" field if the given value is not nil.
+func (cuo *CertUpdateOne) SetNillableCertPath(s *string) *CertUpdateOne {
 	if s != nil {
-		cuo.SetCert(*s)
+		cuo.SetCertPath(*s)
 	}
 	return cuo
 }
 
-// ClearCert clears the value of the "cert" field.
-func (cuo *CertUpdateOne) ClearCert() *CertUpdateOne {
-	cuo.mutation.ClearCert()
+// ClearCertPath clears the value of the "certPath" field.
+func (cuo *CertUpdateOne) ClearCertPath() *CertUpdateOne {
+	cuo.mutation.ClearCertPath()
 	return cuo
 }
 
-// SetKey sets the "key" field.
-func (cuo *CertUpdateOne) SetKey(s string) *CertUpdateOne {
-	cuo.mutation.SetKey(s)
+// SetKeyPath sets the "keyPath" field.
+func (cuo *CertUpdateOne) SetKeyPath(s string) *CertUpdateOne {
+	cuo.mutation.SetKeyPath(s)
 	return cuo
 }
 
-// SetNillableKey sets the "key" field if the given value is not nil.
-func (cuo *CertUpdateOne) SetNillableKey(s *string) *CertUpdateOne {
+// SetNillableKeyPath sets the "keyPath" field if the given value is not nil.
+func (cuo *CertUpdateOne) SetNillableKeyPath(s *string) *CertUpdateOne {
 	if s != nil {
-		cuo.SetKey(*s)
+		cuo.SetKeyPath(*s)
 	}
 	return cuo
 }
 
-// ClearKey clears the value of the "key" field.
-func (cuo *CertUpdateOne) ClearKey() *CertUpdateOne {
-	cuo.mutation.ClearKey()
+// ClearKeyPath clears the value of the "keyPath" field.
+func (cuo *CertUpdateOne) ClearKeyPath() *CertUpdateOne {
+	cuo.mutation.ClearKeyPath()
 	return cuo
 }
 
@@ -310,6 +336,26 @@ func (cuo *CertUpdateOne) SetNillableAuto(b *bool) *CertUpdateOne {
 	if b != nil {
 		cuo.SetAuto(*b)
 	}
+	return cuo
+}
+
+// SetResult sets the "result" field.
+func (cuo *CertUpdateOne) SetResult(s string) *CertUpdateOne {
+	cuo.mutation.SetResult(s)
+	return cuo
+}
+
+// SetNillableResult sets the "result" field if the given value is not nil.
+func (cuo *CertUpdateOne) SetNillableResult(s *string) *CertUpdateOne {
+	if s != nil {
+		cuo.SetResult(*s)
+	}
+	return cuo
+}
+
+// ClearResult clears the value of the "result" field.
+func (cuo *CertUpdateOne) ClearResult() *CertUpdateOne {
+	cuo.mutation.ClearResult()
 	return cuo
 }
 
@@ -365,14 +411,14 @@ func (cuo *CertUpdateOne) check() error {
 			return &ValidationError{Name: "email", err: fmt.Errorf(`ent: validator failed for field "Cert.email": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.Cert(); ok {
-		if err := cert.CertValidator(v); err != nil {
-			return &ValidationError{Name: "cert", err: fmt.Errorf(`ent: validator failed for field "Cert.cert": %w`, err)}
+	if v, ok := cuo.mutation.CertPath(); ok {
+		if err := cert.CertPathValidator(v); err != nil {
+			return &ValidationError{Name: "certPath", err: fmt.Errorf(`ent: validator failed for field "Cert.certPath": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.Key(); ok {
-		if err := cert.KeyValidator(v); err != nil {
-			return &ValidationError{Name: "key", err: fmt.Errorf(`ent: validator failed for field "Cert.key": %w`, err)}
+	if v, ok := cuo.mutation.KeyPath(); ok {
+		if err := cert.KeyPathValidator(v); err != nil {
+			return &ValidationError{Name: "keyPath", err: fmt.Errorf(`ent: validator failed for field "Cert.keyPath": %w`, err)}
 		}
 	}
 	return nil
@@ -421,20 +467,26 @@ func (cuo *CertUpdateOne) sqlSave(ctx context.Context) (_node *Cert, err error) 
 	if value, ok := cuo.mutation.Config(); ok {
 		_spec.SetField(cert.FieldConfig, field.TypeJSON, value)
 	}
-	if value, ok := cuo.mutation.Cert(); ok {
-		_spec.SetField(cert.FieldCert, field.TypeString, value)
+	if value, ok := cuo.mutation.CertPath(); ok {
+		_spec.SetField(cert.FieldCertPath, field.TypeString, value)
 	}
-	if cuo.mutation.CertCleared() {
-		_spec.ClearField(cert.FieldCert, field.TypeString)
+	if cuo.mutation.CertPathCleared() {
+		_spec.ClearField(cert.FieldCertPath, field.TypeString)
 	}
-	if value, ok := cuo.mutation.Key(); ok {
-		_spec.SetField(cert.FieldKey, field.TypeString, value)
+	if value, ok := cuo.mutation.KeyPath(); ok {
+		_spec.SetField(cert.FieldKeyPath, field.TypeString, value)
 	}
-	if cuo.mutation.KeyCleared() {
-		_spec.ClearField(cert.FieldKey, field.TypeString)
+	if cuo.mutation.KeyPathCleared() {
+		_spec.ClearField(cert.FieldKeyPath, field.TypeString)
 	}
 	if value, ok := cuo.mutation.Auto(); ok {
 		_spec.SetField(cert.FieldAuto, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.Result(); ok {
+		_spec.SetField(cert.FieldResult, field.TypeString, value)
+	}
+	if cuo.mutation.ResultCleared() {
+		_spec.ClearField(cert.FieldResult, field.TypeString)
 	}
 	_node = &Cert{config: cuo.config}
 	_spec.Assign = _node.assignValues

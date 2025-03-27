@@ -58,19 +58,24 @@ func Email(v string) predicate.Cert {
 	return predicate.Cert(sql.FieldEQ(FieldEmail, v))
 }
 
-// Cert applies equality check predicate on the "cert" field. It's identical to CertEQ.
-func Cert(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldEQ(FieldCert, v))
+// CertPath applies equality check predicate on the "certPath" field. It's identical to CertPathEQ.
+func CertPath(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEQ(FieldCertPath, v))
 }
 
-// Key applies equality check predicate on the "key" field. It's identical to KeyEQ.
-func Key(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldEQ(FieldKey, v))
+// KeyPath applies equality check predicate on the "keyPath" field. It's identical to KeyPathEQ.
+func KeyPath(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEQ(FieldKeyPath, v))
 }
 
 // Auto applies equality check predicate on the "auto" field. It's identical to AutoEQ.
 func Auto(v bool) predicate.Cert {
 	return predicate.Cert(sql.FieldEQ(FieldAuto, v))
+}
+
+// Result applies equality check predicate on the "result" field. It's identical to ResultEQ.
+func Result(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEQ(FieldResult, v))
 }
 
 // EmailEQ applies the EQ predicate on the "email" field.
@@ -138,154 +143,154 @@ func EmailContainsFold(v string) predicate.Cert {
 	return predicate.Cert(sql.FieldContainsFold(FieldEmail, v))
 }
 
-// CertEQ applies the EQ predicate on the "cert" field.
-func CertEQ(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldEQ(FieldCert, v))
+// CertPathEQ applies the EQ predicate on the "certPath" field.
+func CertPathEQ(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEQ(FieldCertPath, v))
 }
 
-// CertNEQ applies the NEQ predicate on the "cert" field.
-func CertNEQ(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldNEQ(FieldCert, v))
+// CertPathNEQ applies the NEQ predicate on the "certPath" field.
+func CertPathNEQ(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldNEQ(FieldCertPath, v))
 }
 
-// CertIn applies the In predicate on the "cert" field.
-func CertIn(vs ...string) predicate.Cert {
-	return predicate.Cert(sql.FieldIn(FieldCert, vs...))
+// CertPathIn applies the In predicate on the "certPath" field.
+func CertPathIn(vs ...string) predicate.Cert {
+	return predicate.Cert(sql.FieldIn(FieldCertPath, vs...))
 }
 
-// CertNotIn applies the NotIn predicate on the "cert" field.
-func CertNotIn(vs ...string) predicate.Cert {
-	return predicate.Cert(sql.FieldNotIn(FieldCert, vs...))
+// CertPathNotIn applies the NotIn predicate on the "certPath" field.
+func CertPathNotIn(vs ...string) predicate.Cert {
+	return predicate.Cert(sql.FieldNotIn(FieldCertPath, vs...))
 }
 
-// CertGT applies the GT predicate on the "cert" field.
-func CertGT(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldGT(FieldCert, v))
+// CertPathGT applies the GT predicate on the "certPath" field.
+func CertPathGT(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldGT(FieldCertPath, v))
 }
 
-// CertGTE applies the GTE predicate on the "cert" field.
-func CertGTE(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldGTE(FieldCert, v))
+// CertPathGTE applies the GTE predicate on the "certPath" field.
+func CertPathGTE(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldGTE(FieldCertPath, v))
 }
 
-// CertLT applies the LT predicate on the "cert" field.
-func CertLT(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldLT(FieldCert, v))
+// CertPathLT applies the LT predicate on the "certPath" field.
+func CertPathLT(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldLT(FieldCertPath, v))
 }
 
-// CertLTE applies the LTE predicate on the "cert" field.
-func CertLTE(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldLTE(FieldCert, v))
+// CertPathLTE applies the LTE predicate on the "certPath" field.
+func CertPathLTE(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldLTE(FieldCertPath, v))
 }
 
-// CertContains applies the Contains predicate on the "cert" field.
-func CertContains(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldContains(FieldCert, v))
+// CertPathContains applies the Contains predicate on the "certPath" field.
+func CertPathContains(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldContains(FieldCertPath, v))
 }
 
-// CertHasPrefix applies the HasPrefix predicate on the "cert" field.
-func CertHasPrefix(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldHasPrefix(FieldCert, v))
+// CertPathHasPrefix applies the HasPrefix predicate on the "certPath" field.
+func CertPathHasPrefix(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldHasPrefix(FieldCertPath, v))
 }
 
-// CertHasSuffix applies the HasSuffix predicate on the "cert" field.
-func CertHasSuffix(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldHasSuffix(FieldCert, v))
+// CertPathHasSuffix applies the HasSuffix predicate on the "certPath" field.
+func CertPathHasSuffix(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldHasSuffix(FieldCertPath, v))
 }
 
-// CertIsNil applies the IsNil predicate on the "cert" field.
-func CertIsNil() predicate.Cert {
-	return predicate.Cert(sql.FieldIsNull(FieldCert))
+// CertPathIsNil applies the IsNil predicate on the "certPath" field.
+func CertPathIsNil() predicate.Cert {
+	return predicate.Cert(sql.FieldIsNull(FieldCertPath))
 }
 
-// CertNotNil applies the NotNil predicate on the "cert" field.
-func CertNotNil() predicate.Cert {
-	return predicate.Cert(sql.FieldNotNull(FieldCert))
+// CertPathNotNil applies the NotNil predicate on the "certPath" field.
+func CertPathNotNil() predicate.Cert {
+	return predicate.Cert(sql.FieldNotNull(FieldCertPath))
 }
 
-// CertEqualFold applies the EqualFold predicate on the "cert" field.
-func CertEqualFold(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldEqualFold(FieldCert, v))
+// CertPathEqualFold applies the EqualFold predicate on the "certPath" field.
+func CertPathEqualFold(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEqualFold(FieldCertPath, v))
 }
 
-// CertContainsFold applies the ContainsFold predicate on the "cert" field.
-func CertContainsFold(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldContainsFold(FieldCert, v))
+// CertPathContainsFold applies the ContainsFold predicate on the "certPath" field.
+func CertPathContainsFold(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldContainsFold(FieldCertPath, v))
 }
 
-// KeyEQ applies the EQ predicate on the "key" field.
-func KeyEQ(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldEQ(FieldKey, v))
+// KeyPathEQ applies the EQ predicate on the "keyPath" field.
+func KeyPathEQ(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEQ(FieldKeyPath, v))
 }
 
-// KeyNEQ applies the NEQ predicate on the "key" field.
-func KeyNEQ(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldNEQ(FieldKey, v))
+// KeyPathNEQ applies the NEQ predicate on the "keyPath" field.
+func KeyPathNEQ(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldNEQ(FieldKeyPath, v))
 }
 
-// KeyIn applies the In predicate on the "key" field.
-func KeyIn(vs ...string) predicate.Cert {
-	return predicate.Cert(sql.FieldIn(FieldKey, vs...))
+// KeyPathIn applies the In predicate on the "keyPath" field.
+func KeyPathIn(vs ...string) predicate.Cert {
+	return predicate.Cert(sql.FieldIn(FieldKeyPath, vs...))
 }
 
-// KeyNotIn applies the NotIn predicate on the "key" field.
-func KeyNotIn(vs ...string) predicate.Cert {
-	return predicate.Cert(sql.FieldNotIn(FieldKey, vs...))
+// KeyPathNotIn applies the NotIn predicate on the "keyPath" field.
+func KeyPathNotIn(vs ...string) predicate.Cert {
+	return predicate.Cert(sql.FieldNotIn(FieldKeyPath, vs...))
 }
 
-// KeyGT applies the GT predicate on the "key" field.
-func KeyGT(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldGT(FieldKey, v))
+// KeyPathGT applies the GT predicate on the "keyPath" field.
+func KeyPathGT(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldGT(FieldKeyPath, v))
 }
 
-// KeyGTE applies the GTE predicate on the "key" field.
-func KeyGTE(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldGTE(FieldKey, v))
+// KeyPathGTE applies the GTE predicate on the "keyPath" field.
+func KeyPathGTE(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldGTE(FieldKeyPath, v))
 }
 
-// KeyLT applies the LT predicate on the "key" field.
-func KeyLT(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldLT(FieldKey, v))
+// KeyPathLT applies the LT predicate on the "keyPath" field.
+func KeyPathLT(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldLT(FieldKeyPath, v))
 }
 
-// KeyLTE applies the LTE predicate on the "key" field.
-func KeyLTE(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldLTE(FieldKey, v))
+// KeyPathLTE applies the LTE predicate on the "keyPath" field.
+func KeyPathLTE(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldLTE(FieldKeyPath, v))
 }
 
-// KeyContains applies the Contains predicate on the "key" field.
-func KeyContains(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldContains(FieldKey, v))
+// KeyPathContains applies the Contains predicate on the "keyPath" field.
+func KeyPathContains(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldContains(FieldKeyPath, v))
 }
 
-// KeyHasPrefix applies the HasPrefix predicate on the "key" field.
-func KeyHasPrefix(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldHasPrefix(FieldKey, v))
+// KeyPathHasPrefix applies the HasPrefix predicate on the "keyPath" field.
+func KeyPathHasPrefix(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldHasPrefix(FieldKeyPath, v))
 }
 
-// KeyHasSuffix applies the HasSuffix predicate on the "key" field.
-func KeyHasSuffix(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldHasSuffix(FieldKey, v))
+// KeyPathHasSuffix applies the HasSuffix predicate on the "keyPath" field.
+func KeyPathHasSuffix(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldHasSuffix(FieldKeyPath, v))
 }
 
-// KeyIsNil applies the IsNil predicate on the "key" field.
-func KeyIsNil() predicate.Cert {
-	return predicate.Cert(sql.FieldIsNull(FieldKey))
+// KeyPathIsNil applies the IsNil predicate on the "keyPath" field.
+func KeyPathIsNil() predicate.Cert {
+	return predicate.Cert(sql.FieldIsNull(FieldKeyPath))
 }
 
-// KeyNotNil applies the NotNil predicate on the "key" field.
-func KeyNotNil() predicate.Cert {
-	return predicate.Cert(sql.FieldNotNull(FieldKey))
+// KeyPathNotNil applies the NotNil predicate on the "keyPath" field.
+func KeyPathNotNil() predicate.Cert {
+	return predicate.Cert(sql.FieldNotNull(FieldKeyPath))
 }
 
-// KeyEqualFold applies the EqualFold predicate on the "key" field.
-func KeyEqualFold(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldEqualFold(FieldKey, v))
+// KeyPathEqualFold applies the EqualFold predicate on the "keyPath" field.
+func KeyPathEqualFold(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEqualFold(FieldKeyPath, v))
 }
 
-// KeyContainsFold applies the ContainsFold predicate on the "key" field.
-func KeyContainsFold(v string) predicate.Cert {
-	return predicate.Cert(sql.FieldContainsFold(FieldKey, v))
+// KeyPathContainsFold applies the ContainsFold predicate on the "keyPath" field.
+func KeyPathContainsFold(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldContainsFold(FieldKeyPath, v))
 }
 
 // AutoEQ applies the EQ predicate on the "auto" field.
@@ -296,6 +301,81 @@ func AutoEQ(v bool) predicate.Cert {
 // AutoNEQ applies the NEQ predicate on the "auto" field.
 func AutoNEQ(v bool) predicate.Cert {
 	return predicate.Cert(sql.FieldNEQ(FieldAuto, v))
+}
+
+// ResultEQ applies the EQ predicate on the "result" field.
+func ResultEQ(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEQ(FieldResult, v))
+}
+
+// ResultNEQ applies the NEQ predicate on the "result" field.
+func ResultNEQ(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldNEQ(FieldResult, v))
+}
+
+// ResultIn applies the In predicate on the "result" field.
+func ResultIn(vs ...string) predicate.Cert {
+	return predicate.Cert(sql.FieldIn(FieldResult, vs...))
+}
+
+// ResultNotIn applies the NotIn predicate on the "result" field.
+func ResultNotIn(vs ...string) predicate.Cert {
+	return predicate.Cert(sql.FieldNotIn(FieldResult, vs...))
+}
+
+// ResultGT applies the GT predicate on the "result" field.
+func ResultGT(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldGT(FieldResult, v))
+}
+
+// ResultGTE applies the GTE predicate on the "result" field.
+func ResultGTE(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldGTE(FieldResult, v))
+}
+
+// ResultLT applies the LT predicate on the "result" field.
+func ResultLT(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldLT(FieldResult, v))
+}
+
+// ResultLTE applies the LTE predicate on the "result" field.
+func ResultLTE(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldLTE(FieldResult, v))
+}
+
+// ResultContains applies the Contains predicate on the "result" field.
+func ResultContains(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldContains(FieldResult, v))
+}
+
+// ResultHasPrefix applies the HasPrefix predicate on the "result" field.
+func ResultHasPrefix(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldHasPrefix(FieldResult, v))
+}
+
+// ResultHasSuffix applies the HasSuffix predicate on the "result" field.
+func ResultHasSuffix(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldHasSuffix(FieldResult, v))
+}
+
+// ResultIsNil applies the IsNil predicate on the "result" field.
+func ResultIsNil() predicate.Cert {
+	return predicate.Cert(sql.FieldIsNull(FieldResult))
+}
+
+// ResultNotNil applies the NotNil predicate on the "result" field.
+func ResultNotNil() predicate.Cert {
+	return predicate.Cert(sql.FieldNotNull(FieldResult))
+}
+
+// ResultEqualFold applies the EqualFold predicate on the "result" field.
+func ResultEqualFold(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldEqualFold(FieldResult, v))
+}
+
+// ResultContainsFold applies the ContainsFold predicate on the "result" field.
+func ResultContainsFold(v string) predicate.Cert {
+	return predicate.Cert(sql.FieldContainsFold(FieldResult, v))
 }
 
 // And groups predicates with the AND operator between them.

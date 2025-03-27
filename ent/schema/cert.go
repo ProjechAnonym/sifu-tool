@@ -14,8 +14,9 @@ type Cert struct {
 func (Cert) Fields() []ent.Field {
 	return []ent.Field{
 		field.Strings("domains"),field.String("email").NotEmpty().MaxLen(200),
-		field.JSON("config", map[string]string{}),field.String("cert").Optional().MaxLen(1000),
-		field.String("key").Optional().MaxLen(1000),field.Bool("auto"),
+		field.JSON("config", map[string]string{}),field.String("certPath").Optional().MaxLen(1000),
+		field.String("keyPath").Optional().MaxLen(1000),field.Bool("auto"),field.String("result").Optional(),
+		
 	}
 }
 

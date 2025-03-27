@@ -3,6 +3,7 @@ User:
   password: admin
   email: admin@admin.com
   secret: sifulin
+  key: sifulin # 保存acme用户私钥的加密密码
 server:
   # tls:
   #   key: /etc/letsencrypt/live/www.example.com/privkey.pem

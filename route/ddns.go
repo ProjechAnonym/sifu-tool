@@ -58,7 +58,7 @@ func SettingDDNS(api *gin.RouterGroup, secret string, resolvers map[string]map[s
 					ctx.JSON(http.StatusBadRequest, gin.H{"message": "编辑任务时必须指定任务ID"})
 					return
 				}
-				result, err := controller.EditJobs(form, form.Config[models.RESOLVER], id, ipAPI, resolvers, entClient, logger)
+				result, err := controller.EditJob(form, form.Config[models.RESOLVER], id, ipAPI, resolvers, entClient, logger)
 				if err != nil {
 					ctx.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("编辑任务失败: [%s]", err.Error()), "result": result})
 					return
@@ -67,7 +67,7 @@ func SettingDDNS(api *gin.RouterGroup, secret string, resolvers map[string]map[s
 					return
 				}
 			case "add":
-				result, err := controller.AddJobs(form, form.Config[models.RESOLVER], ipAPI, resolvers, entClient, logger)
+				result, err := controller.AddJob(form, form.Config[models.RESOLVER], ipAPI, resolvers, entClient, logger)
 				if err != nil {
 					ctx.JSON(http.StatusInternalServerError, gin.H{"message": fmt.Sprintf("添加任务失败: [%s]", err.Error()), "result": result})
 					return

@@ -12,4 +12,5 @@ type User struct {
 	Password string `yaml:"password"`
 	Email    string `yaml:"email"`
 	Secret   string `yaml:"secret"`
+	Key      string `yaml:"key"`
 }

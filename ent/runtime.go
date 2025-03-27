@@ -32,14 +32,14 @@ func init() {
 			return nil
 		}
 	}()
-	// certDescCert is the schema descriptor for cert field.
-	certDescCert := certFields[3].Descriptor()
-	// cert.CertValidator is a validator for the "cert" field. It is called by the builders before save.
-	cert.CertValidator = certDescCert.Validators[0].(func(string) error)
-	// certDescKey is the schema descriptor for key field.
-	certDescKey := certFields[4].Descriptor()
-	// cert.KeyValidator is a validator for the "key" field. It is called by the builders before save.
-	cert.KeyValidator = certDescKey.Validators[0].(func(string) error)
+	// certDescCertPath is the schema descriptor for certPath field.
+	certDescCertPath := certFields[3].Descriptor()
+	// cert.CertPathValidator is a validator for the "certPath" field. It is called by the builders before save.
+	cert.CertPathValidator = certDescCertPath.Validators[0].(func(string) error)
+	// certDescKeyPath is the schema descriptor for keyPath field.
+	certDescKeyPath := certFields[4].Descriptor()
+	// cert.KeyPathValidator is a validator for the "keyPath" field. It is called by the builders before save.
+	cert.KeyPathValidator = certDescKeyPath.Validators[0].(func(string) error)
 	ddnsFields := schema.DDNS{}.Fields()
 	_ = ddnsFields
 	// ddnsDescIpv6 is the schema descriptor for ipv6 field.

@@ -37,30 +37,30 @@ func (cc *CertCreate) SetConfig(m map[string]string) *CertCreate {
 	return cc
 }
 
-// SetCert sets the "cert" field.
-func (cc *CertCreate) SetCert(s string) *CertCreate {
-	cc.mutation.SetCert(s)
+// SetCertPath sets the "certPath" field.
+func (cc *CertCreate) SetCertPath(s string) *CertCreate {
+	cc.mutation.SetCertPath(s)
 	return cc
 }
 
-// SetNillableCert sets the "cert" field if the given value is not nil.
-func (cc *CertCreate) SetNillableCert(s *string) *CertCreate {
+// SetNillableCertPath sets the "certPath" field if the given value is not nil.
+func (cc *CertCreate) SetNillableCertPath(s *string) *CertCreate {
 	if s != nil {
-		cc.SetCert(*s)
+		cc.SetCertPath(*s)
 	}
 	return cc
 }
 
-// SetKey sets the "key" field.
-func (cc *CertCreate) SetKey(s string) *CertCreate {
-	cc.mutation.SetKey(s)
+// SetKeyPath sets the "keyPath" field.
+func (cc *CertCreate) SetKeyPath(s string) *CertCreate {
+	cc.mutation.SetKeyPath(s)
 	return cc
 }
 
-// SetNillableKey sets the "key" field if the given value is not nil.
-func (cc *CertCreate) SetNillableKey(s *string) *CertCreate {
+// SetNillableKeyPath sets the "keyPath" field if the given value is not nil.
+func (cc *CertCreate) SetNillableKeyPath(s *string) *CertCreate {
 	if s != nil {
-		cc.SetKey(*s)
+		cc.SetKeyPath(*s)
 	}
 	return cc
 }
@@ -68,6 +68,20 @@ func (cc *CertCreate) SetNillableKey(s *string) *CertCreate {
 // SetAuto sets the "auto" field.
 func (cc *CertCreate) SetAuto(b bool) *CertCreate {
 	cc.mutation.SetAuto(b)
+	return cc
+}
+
+// SetResult sets the "result" field.
+func (cc *CertCreate) SetResult(s string) *CertCreate {
+	cc.mutation.SetResult(s)
+	return cc
+}
+
+// SetNillableResult sets the "result" field if the given value is not nil.
+func (cc *CertCreate) SetNillableResult(s *string) *CertCreate {
+	if s != nil {
+		cc.SetResult(*s)
+	}
 	return cc
 }
 
@@ -119,14 +133,14 @@ func (cc *CertCreate) check() error {
 	if _, ok := cc.mutation.Config(); !ok {
 		return &ValidationError{Name: "config", err: errors.New(`ent: missing required field "Cert.config"`)}
 	}
-	if v, ok := cc.mutation.Cert(); ok {
-		if err := cert.CertValidator(v); err != nil {
-			return &ValidationError{Name: "cert", err: fmt.Errorf(`ent: validator failed for field "Cert.cert": %w`, err)}
+	if v, ok := cc.mutation.CertPath(); ok {
+		if err := cert.CertPathValidator(v); err != nil {
+			return &ValidationError{Name: "certPath", err: fmt.Errorf(`ent: validator failed for field "Cert.certPath": %w`, err)}
 		}
 	}
-	if v, ok := cc.mutation.Key(); ok {
-		if err := cert.KeyValidator(v); err != nil {
-			return &ValidationError{Name: "key", err: fmt.Errorf(`ent: validator failed for field "Cert.key": %w`, err)}
+	if v, ok := cc.mutation.KeyPath(); ok {
+		if err := cert.KeyPathValidator(v); err != nil {
+			return &ValidationError{Name: "keyPath", err: fmt.Errorf(`ent: validator failed for field "Cert.keyPath": %w`, err)}
 		}
 	}
 	if _, ok := cc.mutation.Auto(); !ok {
@@ -170,17 +184,21 @@ func (cc *CertCreate) createSpec() (*Cert, *sqlgraph.CreateSpec) {
 		_spec.SetField(cert.FieldConfig, field.TypeJSON, value)
 		_node.Config = value
 	}
-	if value, ok := cc.mutation.Cert(); ok {
-		_spec.SetField(cert.FieldCert, field.TypeString, value)
-		_node.Cert = value
+	if value, ok := cc.mutation.CertPath(); ok {
+		_spec.SetField(cert.FieldCertPath, field.TypeString, value)
+		_node.CertPath = value
 	}
-	if value, ok := cc.mutation.Key(); ok {
-		_spec.SetField(cert.FieldKey, field.TypeString, value)
-		_node.Key = value
+	if value, ok := cc.mutation.KeyPath(); ok {
+		_spec.SetField(cert.FieldKeyPath, field.TypeString, value)
+		_node.KeyPath = value
 	}
 	if value, ok := cc.mutation.Auto(); ok {
 		_spec.SetField(cert.FieldAuto, field.TypeBool, value)
 		_node.Auto = value
+	}
+	if value, ok := cc.mutation.Result(); ok {
+		_spec.SetField(cert.FieldResult, field.TypeString, value)
+		_node.Result = value
 	}
 	return _node, _spec
 }

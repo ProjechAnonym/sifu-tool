@@ -17,12 +17,14 @@ const (
 	FieldEmail = "email"
 	// FieldConfig holds the string denoting the config field in the database.
 	FieldConfig = "config"
-	// FieldCert holds the string denoting the cert field in the database.
-	FieldCert = "cert"
-	// FieldKey holds the string denoting the key field in the database.
-	FieldKey = "key"
+	// FieldCertPath holds the string denoting the certpath field in the database.
+	FieldCertPath = "cert_path"
+	// FieldKeyPath holds the string denoting the keypath field in the database.
+	FieldKeyPath = "key_path"
 	// FieldAuto holds the string denoting the auto field in the database.
 	FieldAuto = "auto"
+	// FieldResult holds the string denoting the result field in the database.
+	FieldResult = "result"
 	// Table holds the table name of the cert in the database.
 	Table = "certs"
 )
@@ -33,9 +35,10 @@ var Columns = []string{
 	FieldDomains,
 	FieldEmail,
 	FieldConfig,
-	FieldCert,
-	FieldKey,
+	FieldCertPath,
+	FieldKeyPath,
 	FieldAuto,
+	FieldResult,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -51,10 +54,10 @@ func ValidColumn(column string) bool {
 var (
 	// EmailValidator is a validator for the "email" field. It is called by the builders before save.
 	EmailValidator func(string) error
-	// CertValidator is a validator for the "cert" field. It is called by the builders before save.
-	CertValidator func(string) error
-	// KeyValidator is a validator for the "key" field. It is called by the builders before save.
-	KeyValidator func(string) error
+	// CertPathValidator is a validator for the "certPath" field. It is called by the builders before save.
+	CertPathValidator func(string) error
+	// KeyPathValidator is a validator for the "keyPath" field. It is called by the builders before save.
+	KeyPathValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Cert queries.
@@ -70,17 +73,22 @@ func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEmail, opts...).ToFunc()
 }
 
-// ByCert orders the results by the cert field.
-func ByCert(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCert, opts...).ToFunc()
+// ByCertPath orders the results by the certPath field.
+func ByCertPath(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCertPath, opts...).ToFunc()
 }
 
-// ByKey orders the results by the key field.
-func ByKey(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldKey, opts...).ToFunc()
+// ByKeyPath orders the results by the keyPath field.
+func ByKeyPath(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldKeyPath, opts...).ToFunc()
 }
 
 // ByAuto orders the results by the auto field.
 func ByAuto(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAuto, opts...).ToFunc()
+}
+
+// ByResult orders the results by the result field.
+func ByResult(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldResult, opts...).ToFunc()
 }

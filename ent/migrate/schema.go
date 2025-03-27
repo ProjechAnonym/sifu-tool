@@ -14,9 +14,10 @@ var (
 		{Name: "domains", Type: field.TypeJSON},
 		{Name: "email", Type: field.TypeString, Size: 200},
 		{Name: "config", Type: field.TypeJSON},
-		{Name: "cert", Type: field.TypeString, Nullable: true, Size: 1000},
-		{Name: "key", Type: field.TypeString, Nullable: true, Size: 1000},
+		{Name: "cert_path", Type: field.TypeString, Nullable: true, Size: 1000},
+		{Name: "key_path", Type: field.TypeString, Nullable: true, Size: 1000},
 		{Name: "auto", Type: field.TypeBool},
+		{Name: "result", Type: field.TypeString, Nullable: true},
 	}
 	// CertsTable holds the schema information for the "certs" table.
 	CertsTable = &schema.Table{
